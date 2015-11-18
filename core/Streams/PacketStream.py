@@ -1,4 +1,6 @@
+# -*- coding: utf8 -*-
 __author__ = 'Viktor Winkelmann'
+
 
 class PacketStream:
     def __init__(self, ipSrc, portSrc, ipDst, portDst, tsFirstPacket = None):

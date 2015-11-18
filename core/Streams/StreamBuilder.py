@@ -1,4 +1,7 @@
+# -*- coding: utf8 -*-
 __author__ = 'Viktor Winkelmann'
+
+
 from TCPStream import *
 from UDPStream import *
 
