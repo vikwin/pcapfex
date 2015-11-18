@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 __author__ = 'Viktor Winkelmann'
 import os, imp
+from collections import OrderedDict
 
 
 class PluginManager:
@@ -8,10 +9,16 @@ class PluginManager:
     DR_PATH = '../../plugins/data_recognizers/'
 
     def __init__(self):
-        self.protocolDissectors = dict()
-        self.dataRecognizers = dict()
+        self.protocolDissectors = OrderedDict()
+        self.dataRecognizers = OrderedDict()
         self.__loadPlugins(self.__class__.PD_PATH, self.protocolDissectors)
         self.__loadPlugins(self.__class__.DR_PATH, self.dataRecognizers)
+
+        self.protocolDissectors = OrderedDict(
+            sorted(self.protocolDissectors.iteritems(), key=lambda x: x[1].priority))
+        self.dataRecognizers = OrderedDict(
+            sorted(self.dataRecognizers.iteritems(), key=lambda x: x[1].priority))
+
 
     def __loadPlugins(self, path, targetdict):
         for pluginfile in os.listdir(path):
