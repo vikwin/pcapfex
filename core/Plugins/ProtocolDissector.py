@@ -3,6 +3,7 @@ __author__ = 'Viktor Winkelmann'
 
 from abc import ABCMeta, abstractmethod
 
+
 class ProtocolDissector:
     __metaclass__ = ABCMeta
 
