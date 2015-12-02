@@ -3,4 +3,10 @@ __author__ = 'Viktor Winkelmann'
 
 class FileManager:
     def __init__(self):
-        pass
+        self.files = []
+
+    def __iter__(self):
+        return self.files.__iter__()
+
+    def addFile(self, file):
+        self.files.append(file)

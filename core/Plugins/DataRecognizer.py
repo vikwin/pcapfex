@@ -13,7 +13,7 @@ class DataCategory:
 
     COMPRESSED = "Compressed file"
     ENCRYPTED = "Encrypted file"
-    UNKOWN = "Unknown data"
+    UNKNOWN = "Unknown data"
 
     def __iter__(self):
         return self.__dict__.__iter__()
@@ -50,7 +50,10 @@ class SimpleDataRecognizer:
         return NotImplemented
 
     @classmethod
-    def findNextOccurence(cls, data, startindex, endindex):
+    def findNextOccurence(cls, data, startindex=0, endindex=None):
+        if endindex is None:
+            endindex = len(data) - 1
+
         occstart = data.find(cls.fileHeader, startindex, endindex)
         if occstart < 0:
             return None

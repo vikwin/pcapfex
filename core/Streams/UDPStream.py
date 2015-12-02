@@ -18,3 +18,17 @@ class UDPStream(PacketStream):
 
     def __iter__(self):
         return iter(self.packets)
+
+    def getFirstBytes(self, count):
+        bytes = ''
+        index = 0
+        while len(bytes) < count and index < len(self.packets):
+            bytes += self.packets[index].data
+            index += 1
+        return bytes[:count]
+
+    def getAllBytes(self):
+        bytes = ''
+        for packet in self.packets:
+            bytes += packet.data
+        return bytes
