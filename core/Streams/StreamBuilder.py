@@ -4,6 +4,7 @@ __author__ = 'Viktor Winkelmann'
 
 from TCPStream import *
 from UDPStream import *
+import socket
 
 class StreamBuilder:
     def __init__(self, pcapfile = None):
@@ -25,7 +26,8 @@ class StreamBuilder:
                 ip = eth.data
                 packet = ip.data
                 if ip.p == dpkt.ip.IP_PROTO_TCP:
-                    tcpStream = TCPStream(ip.src, packet.sport, ip.dst, packet.dport)
+                    tcpStream = TCPStream(socket.inet_ntoa(ip.src), packet.sport,
+                                          socket.inet_ntoa(ip.dst), packet.dport)
                     if tcpStream not in self.tcpStreams:
                         self.tcpStreams.append(tcpStream)
 
@@ -42,6 +44,3 @@ class StreamBuilder:
 
                 else:
                     continue
-
-
-

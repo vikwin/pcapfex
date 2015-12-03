@@ -2,7 +2,8 @@
 __author__ = 'Viktor Winkelmann'
 
 import multiprocessing
-from multiprocessing import Pool, Lock
+from ThreadPool.Pool import Pool
+from threading import Lock
 from Files.FileManager import *
 from Streams.StreamBuilder import *
 from Plugins.PluginManager import *
@@ -11,32 +12,42 @@ class Dispatcher():
     def __init__(self, pcapfile):
         self.pcapfile = pcapfile
         self.filemanager = FileManager()
-        self.pluginmanager = PluginManager()
-        self.resultLock = Lock()
+        self.pm = PluginManager()
         self.printLock = Lock()
+        self.resultLock = Lock()
 
 
     def _lockedPrint(self, output):
-        with self.printLock.acquire():
+        with self.printLock:
             print output
 
     def _finishedSearch(self, (streaminfos, result)):
-        with self.resultLock.acquire():
+        with self.resultLock:
                 print "Found %d files in stream %s" % (len(result), streaminfos)
                 map(self.filemanager.addFile, result)
 
     def run(self):
         streambuilder = StreamBuilder(self.pcapfile)
         allstreams = streambuilder.tcpStreams + streambuilder.udpStreams
-        workers = Pool(processes=multiprocessing.cpu_count())
-        workers.map_async(self._findFiles, allstreams, 1, self._finishedSearch)
+
+        print "File %s has a total of %d single-direction streams." % (self.pcapfile, len(allstreams))
+
+        workers = Pool(multiprocessing.cpu_count())
+        workers.map_async(self._findFiles, allstreams, self._finishedSearch)
+        workers.join()
+
+        print "Search has finished."
 
 
     def _findFiles(self, stream):
         files = []
 
+        self.zipplugin = self.pm.dataRecognizers["zip"]
+        streamdata = stream.getAllBytes()
+        zipindices = self.zipplugin.findNextOccurence(streamdata, 0, 1024)
 
-
+        if not zipindices is None:
+            files.append(streamdata[zipindices[0]:])
 
         return (stream.infos, files)
 

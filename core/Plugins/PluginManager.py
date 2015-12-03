@@ -5,14 +5,15 @@ from collections import OrderedDict
 
 
 class PluginManager:
-    PD_PATH = '../../plugins/protocol_dissectors/'
-    DR_PATH = '../../plugins/data_recognizers/'
+    PD_PATH = '/../../plugins/protocol_dissectors/'
+    DR_PATH = '/../../plugins/data_recognizers/'
 
     def __init__(self):
+        modulepath = os.path.dirname(__file__)
         self.protocolDissectors = OrderedDict()
         self.dataRecognizers = OrderedDict()
-        self.__loadPlugins(self.__class__.PD_PATH, self.protocolDissectors)
-        self.__loadPlugins(self.__class__.DR_PATH, self.dataRecognizers)
+        self.__loadPlugins(modulepath + self.__class__.PD_PATH, self.protocolDissectors)
+        self.__loadPlugins(modulepath + self.__class__.DR_PATH, self.dataRecognizers)
 
         self.protocolDissectors = OrderedDict(
             sorted(self.protocolDissectors.iteritems(), key=lambda x: x[1].priority))
