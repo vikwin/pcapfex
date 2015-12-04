@@ -13,6 +13,7 @@ class PacketStream:
         self.portDst = portDst
         self.ts = tsFirstPacket
         self.infos = "%s:%s to %s:%s" % (ipSrc, portSrc, ipDst, portDst)
+        self.protocol = 'unknown protocol'
 
     def __eq__(self, other):
         if other is None:

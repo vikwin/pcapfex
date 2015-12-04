@@ -12,8 +12,7 @@ def getClassReference():
 
 
 class ZipFile(SimpleDataRecognizer):
-    fileHeader = b'\x50\x4B\x03\x04'
-    fileTrailer = None
+    signatures = [(b'\x50\x4B\x03\x04', None)]
     fileEnding = "zip"
     dataType = "ZIP file"
     dataCategory = DataCategory.COMPRESSED

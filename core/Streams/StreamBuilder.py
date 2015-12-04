@@ -35,7 +35,8 @@ class StreamBuilder:
                     self.tcpStreams[index].addPacket(packet)
 
                 elif ip.p == dpkt.ip.IP_PROTO_UDP:
-                    udpStream = UDPStream(ip.src, packet.sport, ip.dst, packet.dport)
+                    udpStream = UDPStream(socket.inet_ntoa(ip.src), packet.sport,
+                                          socket.inet_ntoa(ip.dst), packet.dport)
                     if udpStream not in self.udpStreams:
                         self.udpStreams.append(udpStream)
 

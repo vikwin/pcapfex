@@ -14,13 +14,16 @@ class UDPStream(PacketStream):
         if type(packet) != dpkt.udp.UDP:
             raise TypeError('Packet is no UDP packet!')
 
+        if len(self.packets) == 0:
+            pass    # TODO: Zeitstempel herausfinden und setzen
+
         self.packets.append(packet)
 
     def __iter__(self):
         return iter(self.packets)
 
     def getFirstBytes(self, count):
-        bytes = ''
+        bytes = b''
         index = 0
         while len(bytes) < count and index < len(self.packets):
             bytes += self.packets[index].data
@@ -28,7 +31,7 @@ class UDPStream(PacketStream):
         return bytes[:count]
 
     def getAllBytes(self):
-        bytes = ''
+        bytes = b''
         for packet in self.packets:
             bytes += packet.data
         return bytes

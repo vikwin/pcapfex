@@ -5,6 +5,7 @@ import multiprocessing
 from ThreadPool.Pool import Pool
 from threading import Lock
 from Files.FileManager import *
+from Files.FileObject import *
 from Streams.StreamBuilder import *
 from Plugins.PluginManager import *
 
@@ -21,9 +22,9 @@ class Dispatcher():
         with self.printLock:
             print output
 
-    def _finishedSearch(self, (streaminfos, result)):
+    def _finishedSearch(self, (stream, result)):
         with self.resultLock:
-                print "Found %d files in stream %s" % (len(result), streaminfos)
+                print "Found %d files in %s stream %s" % (len(result), stream.protocol, stream.infos)
                 map(self.filemanager.addFile, result)
 
     def run(self):
@@ -41,17 +42,30 @@ class Dispatcher():
 
     def _findFiles(self, stream):
         files = []
-
-        self.zipplugin = self.pm.dataRecognizers["zip"]
+        payloads= []
         streamdata = stream.getAllBytes()
-        zipindices = self.zipplugin.findNextOccurence(streamdata, 0, 1024)
 
-        if not zipindices is None:
-            files.append(streamdata[zipindices[0]:])
 
-        return (stream.infos, files)
+        for protocol in self.pm.protocolDissectors:
+            payloads = self.pm.protocolDissectors[protocol].parseData(streamdata)
+
+            if payloads is not None:
+                stream.protocol = self.pm.protocolDissectors[protocol].getProtocolName()
+                break
+
+        for payload in payloads:
+            for datarecognizer in self.pm.dataRecognizers:
+                for occ in self.pm.dataRecognizers[datarecognizer].findAllOccurences(payload):
+                    file = FileObject(payload[occ[0]:occ[1]])
+                    file.source = stream.ipSrc
+                    file.destination = stream.ipDst
+                    if stream.ts:
+                        file.timestamp = stream.ts
+                    files.append(file)
+
+        return (stream, files)
 
 
 if __name__ == '__main__':
-    d = Dispatcher('../tests/zipextract/zipdownload.pcap')
+    d = Dispatcher('../tests/webextract/web.pcap')
     d.run()

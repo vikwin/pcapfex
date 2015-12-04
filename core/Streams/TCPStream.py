@@ -20,7 +20,10 @@ class TCPStream(PacketStream):
         # Pakete ohne Payload werden hier ignoriert, so kann es nicht passieren dass ein leeres ACK mit
         # einer zuvor bereits genutzen Sequenznummer Daten "überschreibt"
         if len(packet.data) > 0:
+            if len(self.packets) == 0:
+                pass    # TODO: Zeitstempel herausfinden und setzen
             self.packets[packet.seq] = packet
+
 
     def __iter__(self):
         sortedPackets = sorted(self.packets.items(), key=lambda kv: kv[0])
@@ -38,7 +41,7 @@ class TCPStream(PacketStream):
     #     return bytes[:count]
 
     def getFirstBytes(self, count):
-        bytes = ''
+        bytes = b''
         index = 0
         sortedPackets = sorted(self.packets.items(), key=lambda kv: kv[0])
         while len(bytes) < count and index < len(sortedPackets):
@@ -48,7 +51,7 @@ class TCPStream(PacketStream):
         return bytes[:count]
 
     def getAllBytes(self):
-        bytes = ''
+        bytes = b''
         for (seq, packet) in sorted(self.packets.items(), key=lambda kv: kv[0]):
             bytes += packet.data
 

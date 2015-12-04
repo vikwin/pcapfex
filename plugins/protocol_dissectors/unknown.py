@@ -8,14 +8,14 @@ from core.Plugins.ProtocolDissector import *
 
 
 def getClassReference():
-    return HTTP
+    return Unknown
 
 
-class HTTP(ProtocolDissector):
+class Unknown(ProtocolDissector):
     @classmethod
     def getProtocolName(cls):
-        return "HTTP"
+        return "unknown protocol"
 
     @classmethod
     def parseData(cls, data):
-        return None  # TODO
+        return [data]

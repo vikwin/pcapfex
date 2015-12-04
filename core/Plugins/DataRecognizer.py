@@ -2,6 +2,7 @@
 __author__ = 'Viktor Winkelmann'
 
 from abc import ABCMeta, abstractproperty
+import re
 
 
 class DataCategory:
@@ -25,12 +26,7 @@ class SimpleDataRecognizer:
     priority = 50
 
     @abstractproperty
-    def fileHeader(cls):
-        """ IMPORTANT: Override as Class Property """
-        return NotImplemented
-
-    @abstractproperty
-    def fileTrailer(cls):
+    def signatures(cls):
         """ IMPORTANT: Override as Class Property """
         return NotImplemented
 
@@ -50,17 +46,36 @@ class SimpleDataRecognizer:
         return NotImplemented
 
     @classmethod
-    def findNextOccurence(cls, data, startindex=0, endindex=None):
-        if endindex is None:
-            endindex = len(data) - 1
+    def _buildRegexPattern(cls, fileHeader, fileTrailer):
+        if fileTrailer is None:
+            fileTrailer = ''
 
-        occstart = data.find(cls.fileHeader, startindex, endindex)
-        if occstart < 0:
-            return None
+        str = b'%s\.*%s' % (fileHeader, fileTrailer)
 
-        occend = None
-        if cls.fileTrailer:
-            # noinspection PyTypeChecker
-            occend = data.rfind(cls.fileTrailer, occstart + len(cls.fileHeader), endindex)
+        return re.compile(str, re.DOTALL)
 
-        return (occstart, occend)
+    @classmethod
+    def findNextOccurence(cls, data, startindex=0, endindex=0):
+        if endindex == 0:
+            endindex = len(data)
+
+        for (fileHeader, fileTrailer) in cls.signatures:
+            regex = cls._buildRegexPattern(fileHeader, fileTrailer)
+            match = regex.search(data, startindex, endindex)
+            if match:
+                return (match.start(), match.end())
+
+        return None
+
+    @classmethod
+    def findAllOccurences(cls, data, startindex=0, endindex=0):
+        occurences = []
+        while startindex < len(data):
+            occurence = cls.findNextOccurence(data, startindex, endindex)
+            if occurence is None:
+                return occurences
+
+            occurences.append(occurence)
+            (_, startindex) = occurence
+
+        return occurences

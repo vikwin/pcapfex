@@ -2,9 +2,10 @@
 __author__ = 'Viktor Winkelmann'
 
 class FileObject:
-    def __init__(self, name, data, source = 'unknown', destination = 'unknown', timestamp = 'unknown'):
-        self.name = name
+    def __init__(self, data):
         self.data = data
-        self.source = source
-        self.destination = destination
-        self.timestamp = timestamp
+        self.name = 'unknown'
+        self.source = 'unknown'
+        self.destination = 'unknown'
+        self.timestamp = 'unknown'
+        self.type = 'unknown'
