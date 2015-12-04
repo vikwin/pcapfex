@@ -9,13 +9,15 @@ from Files.FileObject import *
 from Streams.StreamBuilder import *
 from Plugins.PluginManager import *
 
-class Dispatcher():
-    def __init__(self, pcapfile):
+
+class Dispatcher:
+    def __init__(self, pcapfile, outputdir='output'):
         self.pcapfile = pcapfile
         self.filemanager = FileManager()
         self.pm = PluginManager()
         self.printLock = Lock()
         self.resultLock = Lock()
+        self.outputdir = outputdir
 
 
     def _lockedPrint(self, output):
@@ -28,6 +30,10 @@ class Dispatcher():
                 map(self.filemanager.addFile, result)
 
     def run(self):
+        if os.path.exists(self.outputdir):
+            print "Output folder already exists! Exiting..."
+            return
+
         streambuilder = StreamBuilder(self.pcapfile)
         allstreams = streambuilder.tcpStreams + streambuilder.udpStreams
 
@@ -38,6 +44,7 @@ class Dispatcher():
         workers.join()
 
         print "Search has finished."
+        self.filemanager.writeAllFiles(self.outputdir)
 
 
     def _findFiles(self, stream):
@@ -59,6 +66,8 @@ class Dispatcher():
                     file = FileObject(payload[occ[0]:occ[1]])
                     file.source = stream.ipSrc
                     file.destination = stream.ipDst
+                    file.fileEnding = self.pm.dataRecognizers[datarecognizer].fileEnding
+                    file.type = self.pm.dataRecognizers[datarecognizer].dataCategory
                     if stream.ts:
                         file.timestamp = stream.ts
                     files.append(file)
@@ -67,5 +76,5 @@ class Dispatcher():
 
 
 if __name__ == '__main__':
-    d = Dispatcher('../tests/webextract/web.pcap')
+    d = Dispatcher('../tests/webextract/web_light.pcap')
     d.run()

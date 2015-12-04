@@ -9,3 +9,4 @@ class FileObject:
         self.destination = 'unknown'
         self.timestamp = 'unknown'
         self.type = 'unknown'
+        self.fileEnding = 'unknown'

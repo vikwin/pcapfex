@@ -50,7 +50,7 @@ class SimpleDataRecognizer:
         if fileTrailer is None:
             fileTrailer = ''
 
-        str = b'%s\.*%s' % (fileHeader, fileTrailer)
+        str = b'%s.*%s' % (fileHeader, fileTrailer)
 
         return re.compile(str, re.DOTALL)
 
@@ -63,7 +63,7 @@ class SimpleDataRecognizer:
             regex = cls._buildRegexPattern(fileHeader, fileTrailer)
             match = regex.search(data, startindex, endindex)
             if match:
-                return (match.start(), match.end())
+                return match.span()
 
         return None
 
