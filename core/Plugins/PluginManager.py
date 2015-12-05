@@ -35,4 +35,4 @@ class PluginManager:
 
 if __name__ == "__main__":
     pm = PluginManager()
-    print pm.protocolDissectors['http'].priority
+    print pm.protocolDissectors['http11'].priority

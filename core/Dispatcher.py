@@ -76,5 +76,5 @@ class Dispatcher:
 
 
 if __name__ == '__main__':
-    d = Dispatcher('../tests/webextract/web_light.pcap')
+    d = Dispatcher(os.path.dirname(__file__) + '/../tests/webextract/web_light.pcap')
     d.run()
