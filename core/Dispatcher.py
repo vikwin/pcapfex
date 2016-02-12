@@ -43,7 +43,7 @@ class Dispatcher:
         workers.map_async(self._findFiles, allstreams, self._finishedSearch)
         workers.join()
 
-        print "Search has finished."
+        print "Data search has finished."
         self.filemanager.writeAllFiles(self.outputdir)
 
 
@@ -51,26 +51,31 @@ class Dispatcher:
         files = []
         payloads= []
         streamdata = stream.getAllBytes()
+        streamPorts = (stream.ipSrc, stream.ipDst)
 
-
-        for protocol in self.pm.protocolDissectors:
+        for protocol in self.pm.getProtocolsByHeuristics(streamPorts):
             payloads = self.pm.protocolDissectors[protocol].parseData(streamdata)
 
             if payloads is not None:
                 stream.protocol = self.pm.protocolDissectors[protocol].getProtocolName()
                 break
 
-        for payload in payloads:
-            for datarecognizer in self.pm.dataRecognizers:
-                for occ in self.pm.dataRecognizers[datarecognizer].findAllOccurences(payload):
-                    file = FileObject(payload[occ[0]:occ[1]])
-                    file.source = stream.ipSrc
-                    file.destination = stream.ipDst
-                    file.fileEnding = self.pm.dataRecognizers[datarecognizer].fileEnding
-                    file.type = self.pm.dataRecognizers[datarecognizer].dataCategory
-                    if stream.ts:
-                        file.timestamp = stream.ts
-                    files.append(file)
+        for encPayload in payloads:
+            for decoder in self.pm.decoders:
+                payload = self.pm.decoders[decoder].decodeData(encPayload)
+                if payload is None:
+                    continue
+                
+                for datarecognizer in self.pm.dataRecognizers:
+                    for occ in self.pm.dataRecognizers[datarecognizer].findAllOccurences(payload):
+                        file = FileObject(payload[occ[0]:occ[1]])
+                        file.source = stream.ipSrc
+                        file.destination = stream.ipDst
+                        file.fileEnding = self.pm.dataRecognizers[datarecognizer].fileEnding
+                        file.type = self.pm.dataRecognizers[datarecognizer].dataCategory
+                        if stream.ts:
+                            file.timestamp = stream.ts
+                        files.append(file)
 
         return (stream, files)
 

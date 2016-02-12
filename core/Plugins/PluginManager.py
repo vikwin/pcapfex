@@ -7,19 +7,28 @@ from collections import OrderedDict
 class PluginManager:
     PD_PATH = '/../../plugins/protocol_dissectors/'
     DR_PATH = '/../../plugins/data_recognizers/'
+    DC_PATH = '/../../plugins/decoders/'
 
     def __init__(self):
         modulepath = os.path.dirname(__file__)
         self.protocolDissectors = OrderedDict()
         self.dataRecognizers = OrderedDict()
+        self.decoders = OrderedDict()
         self.__loadPlugins(modulepath + self.__class__.PD_PATH, self.protocolDissectors)
         self.__loadPlugins(modulepath + self.__class__.DR_PATH, self.dataRecognizers)
+        self.__loadPlugins(modulepath + self.__class__.DC_PATH, self.decoders)
 
         self.protocolDissectors = OrderedDict(
-            sorted(self.protocolDissectors.iteritems(), key=lambda x: x[1].priority))
+            sorted(self.protocolDissectors.iteritems(), key=lambda x: x[1].getPriority()))
         self.dataRecognizers = OrderedDict(
-            sorted(self.dataRecognizers.iteritems(), key=lambda x: x[1].priority))
+            sorted(self.dataRecognizers.iteritems(), key=lambda x: x[1].getPriority()))
+        self.decoders = OrderedDict(
+            sorted(self.decoders.iteritems(), key=lambda x: x[1].getPriority()))
 
+
+    def getProtocolsByHeuristics(self, streamPorts):
+        return OrderedDict(
+            sorted(self.protocolDissectors.iteritems(), key=lambda x: x[1].getPriority(streamPorts)))
 
     def __loadPlugins(self, path, targetdict):
         for pluginfile in os.listdir(path):
@@ -35,4 +44,4 @@ class PluginManager:
 
 if __name__ == "__main__":
     pm = PluginManager()
-    print pm.protocolDissectors['http11'].priority
+    print pm.protocolDissectors['http11'].getPriority()

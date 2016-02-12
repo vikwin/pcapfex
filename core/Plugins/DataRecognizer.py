@@ -23,7 +23,12 @@ class DataCategory:
 class SimpleDataRecognizer:
     __metaclass__ = ABCMeta
 
-    priority = 50
+    basePriority = 50
+
+    @classmethod
+    def getPriority(cls):
+        return cls.basePriority
+
 
     @abstractproperty
     def signatures(cls):
@@ -50,7 +55,7 @@ class SimpleDataRecognizer:
         if fileTrailer is None:
             fileTrailer = ''
 
-        str = b'%s.*%s' % (fileHeader, fileTrailer)
+        str = b'%s.*?%s' % (fileHeader, fileTrailer)
 
         return re.compile(str, re.DOTALL)
 

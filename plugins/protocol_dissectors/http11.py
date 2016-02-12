@@ -13,6 +13,8 @@ def getClassReference():
 
 # Parses HTTP Requests / Responses according to http://tools.ietf.org/html/rfc7230
 class HTTP11(ProtocolDissector):
+    defaultPorts = [80, 8080, 8000, 443]
+
     @classmethod
     def getProtocolName(cls):
         return "HTTP 1.1"
@@ -28,7 +30,7 @@ class HTTP11(ProtocolDissector):
             length = int(headers['Content-Length'])
             return data.read(length)
 
-        #TODO Bei anderen Felfkonstellationen Payload liefern
+        #TODO Bei anderen Feldkonstellationen Payload liefern
         return None
 
     @classmethod

@@ -3,25 +3,21 @@ __author__ = 'Viktor Winkelmann'
 
 from abc import ABCMeta, abstractmethod
 
-
-class ProtocolDissector:
+class Decoder:
     __metaclass__ = ABCMeta
-    defaultPorts = []
+
     basePriority = 50
 
     @classmethod
-    def getPriority(cls, streamPorts = ()):
-        if any(map(lambda x: x in cls.defaultPorts, streamPorts)):
-            return cls.basePriority - 50
-
+    def getPriority(cls):
         return cls.basePriority
 
     @abstractmethod
-    def getProtocolName(cls):
+    def getDecoderName(cls):
         """ IMPORTANT: Override as Class Method (using @classmethod) """
         return NotImplemented
 
     @abstractmethod
-    def parseData(cls, data):
+    def decodeData(cls, data):
         """ IMPORTANT: Override as Class Method (using @classmethod) """
         return NotImplemented
