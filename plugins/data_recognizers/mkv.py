@@ -8,11 +8,11 @@ from core.Plugins.DataRecognizer import *
 
 
 def getClassReference():
-    return AviFile
+    return MKVFile
 
 
-class AviFile(SimpleDataRecognizer):
-    signatures = [(b'RIFF.{4}AVI LIST', None)]
-    fileEnding = "avi"
-    dataType = "AVI file"
+class MKVFile(SimpleDataRecognizer):
+    signatures = [(b'\x1A\x45\xDF\xA3.{4}matroska', None)]
+    fileEnding = "mpg"
+    dataType = "MKV file"
     dataCategory = DataCategory.VIDEO
