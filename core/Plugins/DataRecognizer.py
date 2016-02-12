@@ -11,6 +11,7 @@ class DataCategory:
     AUDIO = "Audio file"
     DOC = "Document file"
     TEXT = "Plaintext file"
+    EXECUTABLE = "Executable file"
 
     COMPRESSED = "Compressed file"
     ENCRYPTED = "Encrypted file"
