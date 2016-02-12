@@ -7,10 +7,11 @@ from core.Dispatcher import Dispatcher
 VERSION = "0.1"
 
 parser = argparse.ArgumentParser(description='Extract files from a pcap-file.')
-parser.add_argument('input', metavar='PCAP_FILE', help="the input file")
-parser.add_argument('output', metavar='OUTPUT_FOLDER', help="the target folder for extraction", default='output')
+parser.add_argument('input', metavar='PCAP_FILE', help='the input file')
+parser.add_argument('output', metavar='OUTPUT_FOLDER', help='the target folder for extraction',
+                    nargs='?', default='output')
 
-print "pcapfex - Packet Capture Forensic Evidence Extractor - version %s\n" % VERSION,
+print 'pcapfex - Packet Capture Forensic Evidence Extractor - version %s\n' % VERSION,
 
 args = parser.parse_args()
 

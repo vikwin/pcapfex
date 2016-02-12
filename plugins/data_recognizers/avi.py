@@ -12,7 +12,7 @@ def getClassReference():
 
 
 class AviFile(SimpleDataRecognizer):
-    signatures = [(b'RIFF.{4}AVI LIST', None)]
+    signatures = [('RIFF.{4}AVI LIST', None)]
     fileEnding = "avi"
     dataType = "AVI file"
     dataCategory = DataCategory.VIDEO

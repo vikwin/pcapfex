@@ -54,9 +54,9 @@ class SimpleDataRecognizer:
     @classmethod
     def _buildRegexPattern(cls, fileHeader, fileTrailer):
         if fileTrailer is None:
-            fileTrailer = ''
-
-        str = b'%s.*?%s' % (fileHeader, fileTrailer)
+            str = b'%s.*' % (fileHeader,)
+        else:
+            str = b'%s.*?%s' % (fileHeader, fileTrailer)
 
         return re.compile(str, re.DOTALL)
 

@@ -36,6 +36,8 @@ class PluginManager:
                 continue
             if not pluginfile[-3:] == ".py":
                 continue
+            if pluginfile.endswith("__init__.py"):
+                continue
 
             name = pluginfile.split('/')[-1][:-3]
             module = imp.load_source(name, path + pluginfile)
