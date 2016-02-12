@@ -21,7 +21,7 @@ class HTTP11(ProtocolDissector):
 
     @classmethod
     def getRequestPayload(cls, data):
-        return None #TODO
+        return cls.getResponsePayload(data)     # No special case found yet that has to be handled differently
 
     @classmethod
     def getResponsePayload(cls, data):
@@ -30,7 +30,6 @@ class HTTP11(ProtocolDissector):
             length = int(headers['Content-Length'])
             return data.read(length)
 
-        #TODO Bei anderen Feldkonstellationen Payload liefern
         return None
 
     @classmethod
