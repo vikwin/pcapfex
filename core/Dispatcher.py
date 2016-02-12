@@ -31,7 +31,7 @@ class Dispatcher:
 
     def run(self):
         if os.path.exists(self.outputdir):
-            print "Output folder already exists! Exiting..."
+            print "Output folder \'%s\' already exists! Exiting..." % self.outputdir,
             return
 
         streambuilder = StreamBuilder(self.pcapfile)
