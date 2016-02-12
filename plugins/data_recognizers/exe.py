@@ -12,7 +12,7 @@ def getClassReference():
 
 
 class EXEFile(SimpleDataRecognizer):
-    signatures = [('MZ', None)]
+    signatures = [('MZ.{254}PE', None)]
     fileEnding = "exe"
-    dataType = "DOS/Windows Executable file"
+    dataType = "Windows PE file"
     dataCategory = DataCategory.EXECUTABLE
