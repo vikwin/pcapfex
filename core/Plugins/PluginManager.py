@@ -2,6 +2,7 @@
 __author__ = 'Viktor Winkelmann'
 import os, imp
 from collections import OrderedDict
+from EntropyClassifier import EntropyClassifier
 
 
 class PluginManager:
@@ -14,6 +15,7 @@ class PluginManager:
         self.protocolDissectors = OrderedDict()
         self.dataRecognizers = OrderedDict()
         self.decoders = OrderedDict()
+        self.entropyClassifier = EntropyClassifier()
         self.__loadPlugins(modulepath + self.__class__.PD_PATH, self.protocolDissectors)
         self.__loadPlugins(modulepath + self.__class__.DR_PATH, self.dataRecognizers)
         self.__loadPlugins(modulepath + self.__class__.DC_PATH, self.decoders)

@@ -12,7 +12,7 @@ def getClassReference():
 
 
 class PlainData(Decoder):
-    priority = 10
+    basePriority = 10
 
     @classmethod
     def getDecoderName(cls):

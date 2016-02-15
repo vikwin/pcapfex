@@ -13,6 +13,8 @@ def getClassReference():
 
 # Parses HTTP Requests / Responses according to http://tools.ietf.org/html/rfc1945
 class HTTP10(HTTP11):
+    basePriority = 45
+
     @classmethod
     def getProtocolName(cls):
         return "HTTP 1.0"

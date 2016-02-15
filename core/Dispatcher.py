@@ -8,16 +8,17 @@ from Files.FileManager import *
 from Files.FileObject import *
 from Streams.StreamBuilder import *
 from Plugins.PluginManager import *
-
+from Plugins.EntropyClassifier import DataLengthException
 
 class Dispatcher:
-    def __init__(self, pcapfile, outputdir='output'):
+    def __init__(self, pcapfile, outputdir='output', entropy=False):
         self.pcapfile = pcapfile
         self.filemanager = FileManager()
         self.pm = PluginManager()
         self.printLock = Lock()
         self.resultLock = Lock()
         self.outputdir = outputdir
+        self.useEntropy = entropy
 
 
     def _lockedPrint(self, output):
@@ -65,7 +66,8 @@ class Dispatcher:
                 payload = self.pm.decoders[decoder].decodeData(encPayload)
                 if payload is None:
                     continue
-                
+
+
                 for datarecognizer in self.pm.dataRecognizers:
                     for occ in self.pm.dataRecognizers[datarecognizer].findAllOccurences(payload):
                         file = FileObject(payload[occ[0]:occ[1]])
@@ -76,6 +78,19 @@ class Dispatcher:
                         if stream.ts:
                             file.timestamp = stream.ts
                         files.append(file)
+
+                if self.useEntropy:
+                    try:
+                        type = self.pm.entropyClassifier.classify(payload)
+                        file = FileObject(payload)
+                        file.source = stream.ipSrc
+                        file.destination = stream.ipDst
+                        file.type = type
+                        if stream.ts:
+                            file.timestamp = stream.ts
+                        files.append(file)
+                    except DataLengthException:
+                        pass
 
         return (stream, files)
 
