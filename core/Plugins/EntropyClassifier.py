@@ -3,9 +3,9 @@ __author__ = 'Viktor Winkelmann'
 import math
 
 class EntropyClass:
-    PLAIN = 'rawdata_plain'
-    COMPRESSED = 'rawdata_compressed'
-    ENCRYPTED = 'rawdata_encrypted'
+    PLAIN = 'rawdata/plain file'
+    COMPRESSED = 'rawdata/compressed file'
+    ENCRYPTED = 'rawdata/encrypted file'
 
 class DataLengthException(Exception):
     pass
