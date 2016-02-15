@@ -27,7 +27,7 @@ class StreamBuilder:
                 packet = ip.data
                 if ip.p == dpkt.ip.IP_PROTO_TCP:
                     tcpStream = TCPStream(socket.inet_ntoa(ip.src), packet.sport,
-                                          socket.inet_ntoa(ip.dst), packet.dport)
+                                          socket.inet_ntoa(ip.dst), packet.dport, ts)
                     if tcpStream not in self.tcpStreams:
                         self.tcpStreams.append(tcpStream)
 

@@ -24,13 +24,12 @@ class PacketStream:
             and self.portSrc == other.portSrc \
             and self.ipDst == other.ipDst \
             and self.portDst == other.portDst \
-            and self.ts == other.ts
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        return (str(self.ipSrc) + str(self.portSrc) + str(self.ipDst) + str(self.portDst) + str(self.ts)).__hash__()
+        return (str(self.ipSrc) + str(self.portSrc) + str(self.ipDst) + str(self.portDst)).__hash__()
 
     @abstractmethod
     def getAllBytes(self):

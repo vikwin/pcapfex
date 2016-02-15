@@ -15,7 +15,7 @@ class FileManager:
 
     def writeAllFiles(self, outputdir):
         for file in self.files:
-            path = "%s/%ss/%s_%s/" % (outputdir, file.type, file.source, file.destination)
+            path = "%s/%ss/%s_%s/%s/" % (outputdir, file.type, file.source, file.destination, file.timestamp)
             if not os.path.exists(path):
                 os.makedirs(path)
 

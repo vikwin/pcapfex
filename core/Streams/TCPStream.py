@@ -15,13 +15,11 @@ class TCPStream(PacketStream):
 
     def addPacket(self, packet):
         if type(packet) != dpkt.tcp.TCP:
-            raise TypeError('Packet is no TCP packet!')
+            raise TypeError('Packet is not a TCP packet!')
 
         # Pakete ohne Payload werden hier ignoriert, so kann es nicht passieren dass ein leeres ACK mit
         # einer zuvor bereits genutzen Sequenznummer Daten "überschreibt"
         if len(packet.data) > 0:
-            if len(self.packets) == 0:
-                pass    # TODO: Zeitstempel herausfinden und setzen
             self.packets[packet.seq] = packet
 
 
