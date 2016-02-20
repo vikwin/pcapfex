@@ -50,10 +50,17 @@ class StreamBuilder:
                     tcpStream = TCPStream(socket.inet_ntoa(ip.src), packet.sport,
                                           socket.inet_ntoa(ip.dst), packet.dport)
                     if tcpStream not in self.tcpStreams:
+                        if not (packet.flags & dpkt.tcp.TH_SYN) != 0:
+                            continue
                         self.tcpStreams.append(tcpStream)
 
-                    index = self.tcpStreams.index(tcpStream)
-                    self.tcpStreams[index].addPacket(packet, ts)
+                    # get index of last stream occurence
+                    index = len(self.tcpStreams) - 1 - self.tcpStreams[::-1].index(tcpStream)
+
+                    if not self.tcpStreams[index].closed:
+                        self.tcpStreams[index].addPacket(packet, ts)
+                        if (packet.flags & dpkt.tcp.TH_FIN) != 0:
+                            self.tcpStreams[index].closed = True
 
                 elif ip.p == dpkt.ip.IP_PROTO_UDP:
                     udpStream = UDPStream(socket.inet_ntoa(ip.src), packet.sport,
@@ -66,6 +73,7 @@ class StreamBuilder:
 
                     lastSeen = self.udpStreams[index].tsLastPacket
                     if lastSeen and (ts - lastSeen) > self.UDP_TIMEOUT:
+                        self.udpStreams[index].closed = True
                         self.udpStreams.append(udpStream)
                         index = -1
 

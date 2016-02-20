@@ -15,6 +15,7 @@ class PacketStream:
         self.protocol = 'unknown protocol'
         self.tsFirstPacket = None
         self.tsLastPacket = None
+        self.closed = False
 
     def __eq__(self, other):
         if other is None:
