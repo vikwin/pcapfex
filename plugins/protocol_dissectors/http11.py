@@ -7,13 +7,21 @@ sys.path.append('../..')
 from core.Plugins.ProtocolDissector import *
 from cStringIO import StringIO
 from contextlib import closing
+from gzip import GzipFile
 
 def getClassReference():
     return HTTP11
 
+
 # Parses HTTP Requests / Responses according to http://tools.ietf.org/html/rfc7230
 class HTTP11(ProtocolDissector):
     defaultPorts = [80, 8080, 8000, 443]
+
+    decoders = {
+        'gzip':     lambda x: GzipFile(fileobj=StringIO(x)).read(),
+        'x-gzip':   lambda x: GzipFile(fileobj=StringIO(x)).read(),
+        'deflate':  lambda x: x.decode('zlib'),
+    }
 
     @classmethod
     def getProtocolName(cls):
@@ -24,13 +32,36 @@ class HTTP11(ProtocolDissector):
         return cls.getResponsePayload(data)     # No special case found yet that has to be handled differently
 
     @classmethod
+    def decode(cls, payload, encoding):
+        if not payload:
+            return None
+
+        if encoding not in cls.decoders.keys():
+            return payload
+
+        try:
+            return cls.decoders[encoding](payload)
+        except Exception as e:
+            return payload
+
+    @classmethod
     def getResponsePayload(cls, data):
+        payload = None
+        encoding = None
         headers = cls.parseHeaders(data)
         if 'Content-Length' in headers:
             length = int(headers['Content-Length'])
-            return data.read(length)
+            payload = data.read(length)
 
-        return None
+        if 'Content-Encoding' in headers:
+            encoding = headers['Content-Encoding']
+            encoding = encoding.split(':')[-1].strip().lower()
+
+        if 'Transfer-Encoding' in headers:
+            encoding = headers['Transfer-Encoding']
+            encoding = encoding.split(':')[-1].strip().lower()
+
+        return cls.decode(payload, encoding)
 
     @classmethod
     def parseHeaders(cls, data):
