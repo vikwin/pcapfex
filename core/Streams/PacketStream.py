@@ -6,14 +6,15 @@ from abc import ABCMeta, abstractmethod
 class PacketStream:
     __metaclass__ = ABCMeta
 
-    def __init__(self, ipSrc, portSrc, ipDst, portDst, tsFirstPacket = None):
+    def __init__(self, ipSrc, portSrc, ipDst, portDst):
         self.ipSrc = ipSrc
         self.portSrc = portSrc
         self.ipDst = ipDst
         self.portDst = portDst
-        self.ts = tsFirstPacket
         self.infos = "%s:%s to %s:%s" % (ipSrc, portSrc, ipDst, portDst)
         self.protocol = 'unknown protocol'
+        self.tsFirstPacket = None
+        self.tsLastPacket = None
 
     def __eq__(self, other):
         if other is None:
@@ -37,4 +38,8 @@ class PacketStream:
 
     @abstractmethod
     def getFirstBytes(self, count):
+        return NotImplemented
+
+    @abstractmethod
+    def addPacket(self, packet, ts):
         return NotImplemented

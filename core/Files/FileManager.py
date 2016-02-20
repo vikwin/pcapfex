@@ -2,20 +2,34 @@
 __author__ = 'Viktor Winkelmann'
 
 import os
+from Queue import Queue
+from threading import Thread
 
-class FileManager:
-    def __init__(self):
-        self.files = []
-
-    def __iter__(self):
-        return self.files.__iter__()
+class FileManager(Thread):
+    def __init__(self, outputdir):
+        Thread.__init__(self)
+        self.files = Queue()
+        self.outputdir = outputdir
+        self.stop = False
+        self.start()
 
     def addFile(self, file):
-        self.files.append(file)
+        self.files.put(file)
 
-    def writeAllFiles(self, outputdir):
-        for file in self.files:
-            path = "%s/%ss/%s_%s/%s/" % (outputdir, file.type, file.source, file.destination, file.timestamp)
+    def exit(self):
+        self.files.join()
+        self.stop = True
+        self.files.put(None)
+
+    def run(self):
+        while not self.stop or not self.files.empty():
+            file = self.files.get()
+
+            if not file:
+                self.files.task_done()
+                continue
+
+            path = "%s/%ss/%s_%s/%s/" % (self.outputdir, file.type, file.source, file.destination, file.timestamp)
             if not os.path.exists(path):
                 os.makedirs(path)
 
@@ -29,3 +43,5 @@ class FileManager:
             with open(path + filename, 'wb') as outfile:
                 outfile.write(file.data)
                 print "Wrote file: " + path + filename
+
+            self.files.task_done()

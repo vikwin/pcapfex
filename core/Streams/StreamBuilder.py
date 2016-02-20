@@ -7,10 +7,26 @@ from UDPStream import *
 import socket
 
 class StreamBuilder:
+    UDP_TIMEOUT = 120
+
     def __init__(self, pcapfile = None):
         self.tcpStreams = []
         self.udpStreams = []
         self.__parsePcapfile(pcapfile)
+
+
+    # Verify Layer3/4 Checksums, derived from dpkt/ip.py __str__ method
+    @classmethod
+    def __verify_checksums(cls, ippacket):
+        if dpkt.in_cksum(ippacket.pack_hdr() + str(ippacket.opts)) != 0:
+            return False
+
+        p = str(ippacket.data)
+        s = dpkt.struct.pack('>4s4sxBH', ippacket.src, ippacket.dst,
+                             ippacket.p, len(p))
+        s = dpkt.in_cksum_add(0, s)
+        s = dpkt.in_cksum_add(s, p)
+        return dpkt.in_cksum_done(s) == 0
 
     def __parsePcapfile(self, pcapfile):
         if pcapfile is None:
@@ -24,15 +40,20 @@ class StreamBuilder:
                     continue
 
                 ip = eth.data
+
+                if not self.__verify_checksums(ip):
+                    continue
+
                 packet = ip.data
                 if ip.p == dpkt.ip.IP_PROTO_TCP:
+
                     tcpStream = TCPStream(socket.inet_ntoa(ip.src), packet.sport,
-                                          socket.inet_ntoa(ip.dst), packet.dport, ts)
+                                          socket.inet_ntoa(ip.dst), packet.dport)
                     if tcpStream not in self.tcpStreams:
                         self.tcpStreams.append(tcpStream)
 
                     index = self.tcpStreams.index(tcpStream)
-                    self.tcpStreams[index].addPacket(packet)
+                    self.tcpStreams[index].addPacket(packet, ts)
 
                 elif ip.p == dpkt.ip.IP_PROTO_UDP:
                     udpStream = UDPStream(socket.inet_ntoa(ip.src), packet.sport,
@@ -40,8 +61,15 @@ class StreamBuilder:
                     if udpStream not in self.udpStreams:
                         self.udpStreams.append(udpStream)
 
-                    index = self.udpStreams.index(udpStream)
-                    self.udpStreams[index].addPacket(packet)
+                    # get index of last stream occurence
+                    index = len(self.udpStreams) - 1 - self.udpStreams[::-1].index(udpStream)
+
+                    lastSeen = self.udpStreams[index].tsLastPacket
+                    if lastSeen and (ts - lastSeen) > self.UDP_TIMEOUT:
+                        self.udpStreams.append(udpStream)
+                        index = -1
+
+                    self.udpStreams[index].addPacket(packet, ts)
 
                 else:
                     continue

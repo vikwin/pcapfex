@@ -5,19 +5,24 @@ from PacketStream import *
 import dpkt
 
 class UDPStream(PacketStream):
-    def __init__(self, ipSrc, portSrc, ipDst, portDst, tsFirstPacket = None):
-        PacketStream.__init__(self, ipSrc, portSrc, ipDst, portDst, tsFirstPacket)
+    def __init__(self, ipSrc, portSrc, ipDst, portDst):
+        PacketStream.__init__(self, ipSrc, portSrc, ipDst, portDst)
 
         self.packets = []
+        self.tsLastPacket = None
 
-    def addPacket(self, packet):
+    def addPacket(self, packet, ts):
         if type(packet) != dpkt.udp.UDP:
             raise TypeError('Packet is no UDP packet!')
 
+        if len(packet.data) == 0:
+            return
+
         if len(self.packets) == 0:
-            pass    # TODO: Zeitstempel herausfinden und setzen
+            self.tsFirstpacket = ts
 
         self.packets.append(packet)
+        self.tsLastPacket = ts
 
     def __iter__(self):
         return iter(self.packets)

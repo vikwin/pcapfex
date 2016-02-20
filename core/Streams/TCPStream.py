@@ -5,22 +5,26 @@ import dpkt
 from collections import OrderedDict
 
 class TCPStream(PacketStream):
-    def __init__(self, ipSrc, portSrc, ipDst, portDst, tsFirstPacket = None):
-        PacketStream.__init__(self, ipSrc, portSrc, ipDst, portDst, tsFirstPacket)
+    def __init__(self, ipSrc, portSrc, ipDst, portDst):
+        PacketStream.__init__(self, ipSrc, portSrc, ipDst, portDst)
 
         self.packets = OrderedDict()
 
     def __len__(self):
         return len(self.packets)
 
-    def addPacket(self, packet):
+    def addPacket(self, packet, ts):
         if type(packet) != dpkt.tcp.TCP:
             raise TypeError('Packet is not a TCP packet!')
 
-        # Pakete ohne Payload werden hier ignoriert, so kann es nicht passieren dass ein leeres ACK mit
-        # einer zuvor bereits genutzen Sequenznummer Daten "überschreibt"
-        if len(packet.data) > 0:
+        if len(packet.data) == 0:
+            return
+
+        if packet.seq not in self.packets.keys():
             self.packets[packet.seq] = packet
+
+        if packet.seq == max(self.packets.keys()):
+            self.tsLastPacket = ts
 
 
     def __iter__(self):

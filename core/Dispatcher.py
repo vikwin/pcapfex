@@ -13,7 +13,7 @@ from Plugins.EntropyClassifier import DataLengthException
 class Dispatcher:
     def __init__(self, pcapfile, outputdir='output', entropy=False):
         self.pcapfile = pcapfile
-        self.filemanager = FileManager()
+        self.filemanager = FileManager(outputdir)
         self.pm = PluginManager()
         self.printLock = Lock()
         self.resultLock = Lock()
@@ -33,6 +33,7 @@ class Dispatcher:
     def run(self):
         if os.path.exists(self.outputdir):
             print "Output folder \'%s\' already exists! Exiting..." % self.outputdir,
+            self.filemanager.exit()
             return
 
         streambuilder = StreamBuilder(self.pcapfile)
@@ -41,11 +42,13 @@ class Dispatcher:
         print "File %s has a total of %d single-direction streams." % (self.pcapfile, len(allstreams))
 
         workers = Pool(multiprocessing.cpu_count())
+        #workers = Pool(1)  # for debugging only
         workers.map_async(self._findFiles, allstreams, self._finishedSearch)
         workers.join()
 
         print "Data search has finished."
-        self.filemanager.writeAllFiles(self.outputdir)
+        self.filemanager.exit()
+
 
 
     def _findFiles(self, stream):
@@ -75,8 +78,8 @@ class Dispatcher:
                         file.destination = stream.ipDst
                         file.fileEnding = self.pm.dataRecognizers[datarecognizer].fileEnding
                         file.type = self.pm.dataRecognizers[datarecognizer].dataCategory
-                        if stream.ts:
-                            file.timestamp = stream.ts
+                        if stream.tsFirstPacket:
+                            file.timestamp = stream.tsFirstPacket
                         files.append(file)
 
                 if self.useEntropy:
@@ -86,14 +89,13 @@ class Dispatcher:
                         file.source = stream.ipSrc
                         file.destination = stream.ipDst
                         file.type = type
-                        if stream.ts:
-                            file.timestamp = stream.ts
+                        if stream.tsFirstPacket:
+                            file.timestamp = stream.tsFirstPacket
                         files.append(file)
                     except DataLengthException:
                         pass
 
         return (stream, files)
-
 
 if __name__ == '__main__':
     d = Dispatcher(os.path.dirname(__file__) + '/../tests/webextract/web_light.pcap')
