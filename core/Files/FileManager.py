@@ -1,17 +1,24 @@
 # -*- coding: utf8 -*-
 __author__ = 'Viktor Winkelmann'
 
+import sys
+sys.path.append('../..')
+
 import os
+import core.Utils as Utils
 from Queue import Queue
 from threading import Thread
 
 class FileManager(Thread):
     def __init__(self, outputdir):
         Thread.__init__(self)
+        self.setName('FileManager thread')
+        self.daemon = True
+
         self.files = Queue()
         self.outputdir = outputdir
+
         self.stop = False
-        self.daemon = True
         self.start()
 
     def addFile(self, file):
@@ -43,6 +50,6 @@ class FileManager(Thread):
 
             with open(path + filename, 'wb') as outfile:
                 outfile.write(file.data)
-                print "Wrote file: " + path + filename
+                Utils.printl("Wrote file: %s%s" % (path, filename))
 
             self.files.task_done()

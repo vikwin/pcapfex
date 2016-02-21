@@ -6,6 +6,7 @@ from TCPStream import *
 from UDPStream import *
 import socket
 import os
+import sys
 
 class StreamBuilder:
     def __init__(self, pcapfile = None, **kwargs):
@@ -51,13 +52,15 @@ class StreamBuilder:
             fsize = float(os.path.getsize(pcapfile))
             progress = -1
 
-            print 'Size of file %s: %.2f mb' % (pcapfile, fsize / 1000000)
+            print '  Size of file %s: %.2f mb' % (pcapfile, fsize / 1000000)
             for ts, rawpacket in packets:
 
                 pos = int((pcap.tell() / fsize) * 100)
-                if pos % 10 == 0 and pos > progress:
-                    print " %d%%" % (pos,),
+                if pos > progress:
+                    sys.stdout.write("\r\t%d%%" % (pos,))
+                    sys.stdout.flush()
                     progress = pos
+
 
                 eth = dpkt.ethernet.Ethernet(rawpacket)
                 if eth.type != dpkt.ethernet.ETH_TYPE_IP:

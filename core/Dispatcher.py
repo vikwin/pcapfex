@@ -3,7 +3,6 @@ __author__ = 'Viktor Winkelmann'
 
 import multiprocessing
 from ThreadPool.Pool import Pool
-from threading import Lock
 from Files.FileManager import *
 from Files.FileObject import *
 from Streams.StreamBuilder import *
@@ -11,29 +10,23 @@ from Plugins.PluginManager import *
 from Plugins.EntropyClassifier import DataLengthException
 
 class Dispatcher:
+
+
     def __init__(self, pcapfile, outputdir='output', entropy=False, **kwargs):
         self.kwargs = kwargs
         self.pcapfile = pcapfile
         self.filemanager = FileManager(outputdir)
         self.pm = PluginManager()
-        self.printLock = Lock()
-        self.resultLock = Lock()
         self.outputdir = outputdir
         self.useEntropy = entropy
 
-
-    def _lockedPrint(self, output):
-        with self.printLock:
-            print output
-
     def _finishedSearch(self, (stream, result)):
-        with self.resultLock:
-                print "Found %d files in %s stream %s" % (len(result), stream.protocol, stream.infos)
-                map(self.filemanager.addFile, result)
+        Utils.printl("Found %d files in %s stream %s" % (len(result), stream.protocol, stream.infos))
+        map(self.filemanager.addFile, result)
 
     def run(self):
         if os.path.exists(self.outputdir):
-            print "Output folder \'%s\' already exists! Exiting..." % self.outputdir,
+            print "Output folder \'%s\' already exists! Exiting..." % (self.outputdir,)
             self.filemanager.exit()
             return
 
@@ -45,13 +38,14 @@ class Dispatcher:
         print "\nStream Reassembly finished.\n\tFile %s has a total of %d single-direction streams." % (self.pcapfile,
                                                                                                    len(allstreams))
 
+        print "Searching streams for forensic evidence...\n"
         workers = Pool(multiprocessing.cpu_count())
         #workers = Pool(1)  # for debugging only
         workers.map_async(self._findFiles, allstreams, self._finishedSearch)
         workers.join()
 
-        print "Data search has finished."
         self.filemanager.exit()
+        print "Evidence search has finished."
 
 
 
