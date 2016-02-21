@@ -5,6 +5,7 @@ __author__ = 'Viktor Winkelmann'
 from TCPStream import *
 from UDPStream import *
 import socket
+import os
 
 class StreamBuilder:
     def __init__(self, pcapfile = None, **kwargs):
@@ -43,9 +44,21 @@ class StreamBuilder:
         if pcapfile is None:
             return
 
+
         with open(pcapfile, 'rb') as pcap:
             packets = dpkt.pcap.Reader(pcap)
+
+            fsize = float(os.path.getsize(pcapfile))
+            progress = -1
+
+            print 'Size of file %s: %.2f mb' % (pcapfile, fsize / 1000000)
             for ts, rawpacket in packets:
+
+                pos = int((pcap.tell() / fsize) * 100)
+                if pos % 10 == 0 and pos > progress:
+                    print " %d%%" % (pos,),
+                    progress = pos
+
                 eth = dpkt.ethernet.Ethernet(rawpacket)
                 if eth.type != dpkt.ethernet.ETH_TYPE_IP:
                     continue

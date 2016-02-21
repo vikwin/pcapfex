@@ -42,7 +42,7 @@ class Dispatcher:
         streambuilder = StreamBuilder(self.pcapfile, **self.kwargs)
         allstreams = streambuilder.tcpStreams + streambuilder.udpStreams
 
-        print "Stream Reassembly finished.\n\tFile %s has a total of %d single-direction streams." % (self.pcapfile,
+        print "\nStream Reassembly finished.\n\tFile %s has a total of %d single-direction streams." % (self.pcapfile,
                                                                                                    len(allstreams))
 
         workers = Pool(multiprocessing.cpu_count())
