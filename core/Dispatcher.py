@@ -11,7 +11,8 @@ from Plugins.PluginManager import *
 from Plugins.EntropyClassifier import DataLengthException
 
 class Dispatcher:
-    def __init__(self, pcapfile, outputdir='output', entropy=False):
+    def __init__(self, pcapfile, outputdir='output', entropy=False, **kwargs):
+        self.kwargs = kwargs
         self.pcapfile = pcapfile
         self.filemanager = FileManager(outputdir)
         self.pm = PluginManager()
@@ -36,10 +37,13 @@ class Dispatcher:
             self.filemanager.exit()
             return
 
-        streambuilder = StreamBuilder(self.pcapfile)
+
+        print "Reassembling streams..."
+        streambuilder = StreamBuilder(self.pcapfile, **self.kwargs)
         allstreams = streambuilder.tcpStreams + streambuilder.udpStreams
 
-        print "File %s has a total of %d single-direction streams." % (self.pcapfile, len(allstreams))
+        print "Stream Reassembly finished.\n\tFile %s has a total of %d single-direction streams." % (self.pcapfile,
+                                                                                                   len(allstreams))
 
         workers = Pool(multiprocessing.cpu_count())
         #workers = Pool(1)  # for debugging only

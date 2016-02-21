@@ -11,6 +11,7 @@ class FileManager(Thread):
         self.files = Queue()
         self.outputdir = outputdir
         self.stop = False
+        self.daemon = True
         self.start()
 
     def addFile(self, file):

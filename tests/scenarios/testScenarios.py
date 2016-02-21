@@ -36,35 +36,35 @@ class TestScenarios(unittest.TestCase):
     def test_scenario4_1(self):
         target = open('4.1/file.zip', 'rb').read()
 
-        d = Dispatcher('4.1/4.1.pcap', self.OUTPUT_PATH)
+        d = Dispatcher('4.1/4.1.pcap', self.OUTPUT_PATH, verifyChecksums=False)
         d.run()
         self.assertTrue(self.findFile(target))
 
     def test_scenario4_2(self):
         target = open('4.2/file.jpg', 'rb').read()
 
-        d = Dispatcher('4.2/4.2.pcap', self.OUTPUT_PATH)
+        d = Dispatcher('4.2/4.2.pcap', self.OUTPUT_PATH, verifyChecksums=False)
         d.run()
         self.assertTrue(self.findFile(target))
 
     def test_scenario4_3(self):
         target = open('4.3/file.pdf', 'rb').read()
 
-        d = Dispatcher('4.3/4.3.pcap', self.OUTPUT_PATH)
+        d = Dispatcher('4.3/4.3.pcap', self.OUTPUT_PATH, verifyChecksums=False)
         d.run()
         self.assertTrue(self.findFile(target))
 
     def test_scenario4_4(self):
         target = open('4.4/file.mp3', 'rb').read()
 
-        d = Dispatcher('4.4/4.4.pcap', self.OUTPUT_PATH)
+        d = Dispatcher('4.4/4.4.pcap', self.OUTPUT_PATH, verifyChecksums=False)
         d.run()
         self.assertTrue(self.findFile(target))
 
     def test_scenario4_5(self):
         target = open('4.5/file.aes', 'rb').read()
 
-        d = Dispatcher('4.5/4.5.pcap', self.OUTPUT_PATH, True)
+        d = Dispatcher('4.5/4.5.pcap', self.OUTPUT_PATH, True, verifyChecksums=False)
         d.run()
 
         h = 'this is the header!(§$%113550987'

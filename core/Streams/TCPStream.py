@@ -2,13 +2,12 @@
 __author__ = 'Viktor Winkelmann'
 from PacketStream import *
 import dpkt
-from collections import OrderedDict
 
 class TCPStream(PacketStream):
     def __init__(self, ipSrc, portSrc, ipDst, portDst):
         PacketStream.__init__(self, ipSrc, portSrc, ipDst, portDst)
 
-        self.packets = OrderedDict()
+        self.packets = dict()
 
     def __len__(self):
         return len(self.packets)
@@ -20,10 +19,10 @@ class TCPStream(PacketStream):
         if len(packet.data) == 0:
             return
 
-        if packet.seq not in self.packets.keys():
+        if packet.seq not in self.packets:
             self.packets[packet.seq] = packet
 
-        if packet.seq == max(self.packets.keys()):
+        if ts > self.tsLastPacket:
             self.tsLastPacket = ts
 
 

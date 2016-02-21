@@ -7,11 +7,19 @@ from UDPStream import *
 import socket
 
 class StreamBuilder:
-    UDP_TIMEOUT = 120
-
-    def __init__(self, pcapfile = None):
+    def __init__(self, pcapfile = None, **kwargs):
         self.tcpStreams = []
         self.udpStreams = []
+        self.UDP_TIMEOUT = 120
+        self.VERIFY_CHECKSUMS = True   # Might need to be disabled if Checksum Offloading
+                                        # was used on the capturing NIC
+
+        if 'udpTimeout' in kwargs:
+            self.UDP_TIMEOUT = kwargs['udpTimeout']
+
+        if 'verifyChecksums' in kwargs:
+            self.VERIFY_CHECKSUMS = kwargs['verifyChecksums']
+
         self.__parsePcapfile(pcapfile)
 
 
@@ -20,6 +28,9 @@ class StreamBuilder:
     def __verify_checksums(cls, ippacket):
         if dpkt.in_cksum(ippacket.pack_hdr() + str(ippacket.opts)) != 0:
             return False
+
+        if (ippacket.off & (dpkt.ip.IP_MF | dpkt.ip.IP_OFFMASK)) != 0:
+            return True
 
         p = str(ippacket.data)
         s = dpkt.struct.pack('>4s4sxBH', ippacket.src, ippacket.dst,
@@ -32,7 +43,7 @@ class StreamBuilder:
         if pcapfile is None:
             return
 
-        with open(pcapfile) as pcap:
+        with open(pcapfile, 'rb') as pcap:
             packets = dpkt.pcap.Reader(pcap)
             for ts, rawpacket in packets:
                 eth = dpkt.ethernet.Ethernet(rawpacket)
@@ -41,7 +52,7 @@ class StreamBuilder:
 
                 ip = eth.data
 
-                if not self.__verify_checksums(ip):
+                if self.VERIFY_CHECKSUMS and not self.__verify_checksums(ip):
                     continue
 
                 packet = ip.data
