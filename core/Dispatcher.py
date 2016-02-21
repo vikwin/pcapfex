@@ -10,8 +10,6 @@ from Plugins.PluginManager import *
 from Plugins.EntropyClassifier import DataLengthException
 
 class Dispatcher:
-
-
     def __init__(self, pcapfile, outputdir='output', entropy=False, **kwargs):
         self.kwargs = kwargs
         self.pcapfile = pcapfile
@@ -45,7 +43,7 @@ class Dispatcher:
         workers.join()
 
         self.filemanager.exit()
-        print "Evidence search has finished."
+        print "Evidence search has finished.\n"
 
 
 

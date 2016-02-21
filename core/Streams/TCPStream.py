@@ -22,7 +22,10 @@ class TCPStream(PacketStream):
         if packet.seq not in self.packets:
             self.packets[packet.seq] = packet
 
-        if ts > self.tsLastPacket:
+        if self.tsFirstPacket is None or ts < self.tsFirstPacket:
+            self.tsFirstPacket = ts
+
+        if self.tsLastPacket is None or ts > self.tsLastPacket:
             self.tsLastPacket = ts
 
 

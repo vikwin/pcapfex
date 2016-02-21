@@ -25,7 +25,7 @@ class StreamBuilder:
         self.__parsePcapfile(pcapfile)
 
 
-    # Verify Layer3/4 Checksums, derived from dpkt/ip.py __str__ method
+    # Verify Layer3/4 Checksums, see dpkt/ip.py __str__ method
     @classmethod
     def __verify_checksums(cls, ippacket):
         if dpkt.in_cksum(ippacket.pack_hdr() + str(ippacket.opts)) != 0:
@@ -92,6 +92,8 @@ class StreamBuilder:
                 elif ip.p == dpkt.ip.IP_PROTO_UDP:
                     udpStream = UDPStream(socket.inet_ntoa(ip.src), packet.sport,
                                           socket.inet_ntoa(ip.dst), packet.dport)
+                    udpStream.tsFirstPacket = ts
+
                     if udpStream not in self.udpStreams:
                         self.udpStreams.append(udpStream)
 
