@@ -16,9 +16,9 @@ _pcapfex_ was developed and tested for **Linux environments only**.
 Due to missing optimizations and tests, there is no guarantee for it to work
 under Windows.
 
-_pcapfex_ depends on the _dpkt_ package. You can install it via
+_pcapfex_ depends on **Python 2.7** and the **_dpkt_** package. You can install it via
 ```
-pip install dpkt
+sudo pip install dpkt
 ```
 
 ### Usage

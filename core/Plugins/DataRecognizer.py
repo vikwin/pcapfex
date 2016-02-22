@@ -4,6 +4,7 @@ __author__ = 'Viktor Winkelmann'
 from abc import ABCMeta, abstractproperty
 import re
 
+#from pympler import tracker
 
 class DataCategory:
     IMAGE = "Image file"
@@ -52,21 +53,21 @@ class SimpleDataRecognizer:
         return NotImplemented
 
     @classmethod
-    def _buildRegexPattern(cls, fileHeader, fileTrailer):
-        if fileTrailer is None:
-            str = b'%s.*' % (fileHeader,)
-        else:
-            str = b'%s.*?%s' % (fileHeader, fileTrailer)
-
-        return re.compile(str, re.DOTALL)
+    def _buildRegexPatterns(cls):
+        cls._regexes = []
+        for (fileHeader, fileTrailer) in cls.signatures:
+            if fileTrailer is None:
+                str = b'%s.*' % (fileHeader,)
+            else:
+                str = b'%s.*?%s' % (fileHeader, fileTrailer)
+            cls._regexes.append(re.compile(str, re.DOTALL))
 
     @classmethod
     def findNextOccurence(cls, data, startindex=0, endindex=0):
         if endindex == 0:
             endindex = len(data)
 
-        for (fileHeader, fileTrailer) in cls.signatures:
-            regex = cls._buildRegexPattern(fileHeader, fileTrailer)
+        for regex in cls._regexes:
             match = regex.search(data, startindex, endindex)
             if match:
                 return match.span()
@@ -75,13 +76,14 @@ class SimpleDataRecognizer:
 
     @classmethod
     def findAllOccurences(cls, data, startindex=0, endindex=0):
+        if endindex == 0:
+            endindex = len(data)
+
+        #tr = tracker.SummaryTracker()
         occurences = []
-        while startindex < len(data):
-            occurence = cls.findNextOccurence(data, startindex, endindex)
-            if occurence is None:
-                return occurences
 
-            occurences.append(occurence)
-            (_, startindex) = occurence
+        for regex in cls._regexes:
+            map(lambda m: occurences.append(m.span()), regex.finditer(data, startindex, endindex))
 
+        #tr.print_diff()
         return occurences

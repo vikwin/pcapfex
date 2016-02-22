@@ -44,6 +44,8 @@ class PluginManager:
             name = pluginfile.split('/')[-1][:-3]
             module = imp.load_source(name, path + pluginfile)
             targetdict[name] = module.getClassReference()
+            if targetdict is self.dataRecognizers:
+               targetdict[name]._buildRegexPatterns()
 
 
 if __name__ == "__main__":

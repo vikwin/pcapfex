@@ -9,6 +9,8 @@ from Streams.StreamBuilder import *
 from Plugins.PluginManager import *
 from Plugins.EntropyClassifier import DataLengthException
 
+DEBUG = False
+
 class Dispatcher:
     def __init__(self, pcapfile, outputdir='output', entropy=False, **kwargs):
         self.kwargs = kwargs
@@ -37,10 +39,16 @@ class Dispatcher:
                                                                                                    len(allstreams))
 
         print "Searching streams for forensic evidence...\n"
-        workers = Pool(multiprocessing.cpu_count())
-        #workers = Pool(1)  # for debugging only
-        workers.map_async(self._findFiles, allstreams, self._finishedSearch)
-        workers.join()
+        if DEBUG:
+            # Single threaded search for easier debugging
+            map(lambda s: self._finishedSearch(self._findFiles(s)), allstreams)
+        else:
+            # Multi threaded search as standard
+            workers = Pool(multiprocessing.cpu_count())
+            workers.map_async(self._findFiles, allstreams, self._finishedSearch)
+            workers.join()
+
+
 
         self.filemanager.exit()
         print "Evidence search has finished.\n"
