@@ -1,5 +1,8 @@
 # -*- coding: utf8 -*-
 __author__ = 'Viktor Winkelmann'
+
+from cStringIO import StringIO
+from contextlib import closing
 from PacketStream import *
 import dpkt
 
@@ -34,30 +37,20 @@ class TCPStream(PacketStream):
         for k,v in sortedPackets:
             yield v
 
-    # def getFirstBytes(self, count):
-    #     bytes = bytearray()
-    #     index = 0
-    #     sortedPackets = sorted(self.packets.items(), key=lambda kv: kv[0])
-    #     while len(bytes) < count and index < len(sortedPackets):
-    #         bytes = bytes.join(sortedPackets[index][1].data)
-    #         index += 1
-    #
-    #     return bytes[:count]
-
     def getFirstBytes(self, count):
-        bytes = b''
-        index = 0
-        sortedPackets = sorted(self.packets.items(), key=lambda kv: kv[0])
-        while len(bytes) < count and index < len(sortedPackets):
-            bytes += sortedPackets[index][1].data
-            index += 1
+        with closing(StringIO()) as bytes:
+            index = 0
+            sortedPackets = sorted(self.packets.items(), key=lambda kv: kv[0])
+            while len(bytes) < count and index < len(sortedPackets):
+                bytes.write(sortedPackets[index][1].data)
+                index += 1
 
-        return bytes[:count]
+            return bytes.getvalue()[:count]
 
     def getAllBytes(self):
-        bytes = b''
-        for (seq, packet) in sorted(self.packets.items(), key=lambda kv: kv[0]):
-            bytes += packet.data
+        with closing(StringIO()) as bytes:
+            for (seq, packet) in sorted(self.packets.items(), key=lambda kv: kv[0]):
+                bytes.write(packet.data)
 
-        return bytes
+            return bytes.getvalue()
 
