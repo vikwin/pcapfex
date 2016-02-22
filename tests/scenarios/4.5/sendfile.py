@@ -1,15 +1,22 @@
 # -*- coding: utf8 -*-
 __author__ = 'Viktor Winkelmann'
 
-from socket import socket
+from socket import *
 
-with open('file.aes', 'rb') as inputfile:
-    data = inputfile.read()
+CHUNKSIZE = 1400
 
-    h = 'this is the header!(§$%113550987'
-    t = 'TRAILER_'
+with open('file.mp3', 'rb') as inputfile:
+    s = socket(AF_INET, SOCK_DGRAM)
 
-    s = socket()
-    s.connect(('192.168.123.37', 4242))
-    s.sendall(h + data + t)
+    data = inputfile.read(CHUNKSIZE)
+    while data != '':
+        s.sendto(data, ('192.168.123.37', 4242))
+        data = inputfile.read(CHUNKSIZE)
+
     s.close()
+
+
+
+
+
+

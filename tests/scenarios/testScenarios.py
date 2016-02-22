@@ -62,9 +62,17 @@ class TestScenarios(unittest.TestCase):
         self.assertTrue(self.findFile(target))
 
     def test_scenario4_5(self):
-        target = open('4.5/file.aes', 'rb').read()
+        target = open('4.5/file.mp3', 'rb').read()
 
-        d = Dispatcher('4.5/4.5.pcap', self.OUTPUT_PATH, True, verifyChecksums=False)
+        d = Dispatcher('4.5/4.5.pcap', self.OUTPUT_PATH, verifyChecksums=False)
+        d.run()
+        self.assertTrue(self.findFile(target))
+
+
+    def test_scenario4_6(self):
+        target = open('4.6/file.aes', 'rb').read()
+
+        d = Dispatcher('4.6/4.6.pcap', self.OUTPUT_PATH, True, verifyChecksums=False)
         d.run()
 
         h = 'this is the header!(§$%113550987'
