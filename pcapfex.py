@@ -5,7 +5,7 @@ __author__ = 'Viktor Winkelmann'
 import argparse
 from core.Dispatcher import Dispatcher
 
-VERSION = "1.0 RC1"
+VERSION = "1.0 RC2"
 
 parser = argparse.ArgumentParser(description='Extract files from a pcap-file.')
 parser.add_argument('input', metavar='PCAP_FILE', help='the input file')
