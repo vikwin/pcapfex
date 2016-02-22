@@ -54,23 +54,23 @@ class SimpleDataRecognizer:
 
     @classmethod
     def _buildRegexPatterns(cls):
-        cls._regexes = []
-        for (fileHeader, fileTrailer) in cls.signatures:
+        regexstr = b''
+        for (fileHeader, fileTrailer) in cls.signatures:   
             if fileTrailer is None:
-                str = b'%s.*' % (fileHeader,)
+                regexstr += b'(%s.*)|' % (fileHeader,)
             else:
-                str = b'%s.*?%s' % (fileHeader, fileTrailer)
-            cls._regexes.append(re.compile(str, re.DOTALL))
+                regexstr += b'(%s.*?%s)|' % (fileHeader, fileTrailer)
+       
+        cls._regex = re.compile(regexstr[:-1], re.DOTALL)
 
     @classmethod
     def findNextOccurence(cls, data, startindex=0, endindex=0):
         if endindex == 0:
             endindex = len(data)
 
-        for regex in cls._regexes:
-            match = regex.search(data, startindex, endindex)
-            if match:
-                return match.span()
+        match = cls._regex.search(data, startindex, endindex)
+        if match:
+            return match.span()
 
         return None
 
@@ -82,8 +82,7 @@ class SimpleDataRecognizer:
         #tr = tracker.SummaryTracker()
         occurences = []
 
-        for regex in cls._regexes:
-            map(lambda m: occurences.append(m.span()), regex.finditer(data, startindex, endindex))
+        map(lambda m: occurences.append(m.span()), cls._regex.finditer(data, startindex, endindex))
 
         #tr.print_diff()
         return occurences
