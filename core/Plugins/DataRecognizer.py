@@ -2,6 +2,7 @@
 __author__ = 'Viktor Winkelmann'
 
 from abc import ABCMeta, abstractproperty
+from Plugin import *
 try:
     import regex as re
     print 'Using concurrency enabled regex module.'
@@ -27,10 +28,8 @@ class DataCategory:
         return self.__dict__.__iter__()
 
 
-class SimpleDataRecognizer:
+class SimpleDataRecognizer(Plugin):
     __metaclass__ = ABCMeta
-
-    basePriority = 50
 
     @classmethod
     def getPriority(cls):

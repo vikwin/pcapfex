@@ -2,11 +2,10 @@
 __author__ = 'Viktor Winkelmann'
 
 from abc import ABCMeta, abstractmethod
+from Plugin import *
 
-class Decoder:
+class Decoder(Plugin):
     __metaclass__ = ABCMeta
-
-    basePriority = 50
 
     @classmethod
     def getPriority(cls):

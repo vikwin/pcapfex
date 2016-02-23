@@ -2,12 +2,11 @@
 __author__ = 'Viktor Winkelmann'
 
 from abc import ABCMeta, abstractmethod
+from Plugin import *
 
-
-class ProtocolDissector:
+class ProtocolDissector(Plugin):
     __metaclass__ = ABCMeta
     defaultPorts = []
-    basePriority = 50
 
     @classmethod
     def getPriority(cls, streamPorts = ()):
