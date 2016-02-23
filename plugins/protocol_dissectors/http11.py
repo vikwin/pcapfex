@@ -23,9 +23,7 @@ class HTTP11(ProtocolDissector):
         'deflate':  lambda x: x.decode('zlib'),
     }
 
-    @classmethod
-    def getProtocolName(cls):
-        return "HTTP 1.1"
+    protocolName = "HTTP 1.1"
 
     @classmethod
     def getRequestPayload(cls, data):

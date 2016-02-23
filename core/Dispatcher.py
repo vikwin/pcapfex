@@ -65,7 +65,7 @@ class Dispatcher:
             payloads = self.pm.protocolDissectors[protocol].parseData(streamdata)
 
             if payloads is not None:
-                stream.protocol = self.pm.protocolDissectors[protocol].getProtocolName()
+                stream.protocol = self.pm.protocolDissectors[protocol].protocolName
                 break
 
         for encPayload in payloads:

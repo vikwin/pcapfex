@@ -13,9 +13,7 @@ def getClassReference():
 
 
 class Base64Decoder(Decoder):
-    @classmethod
-    def getDecoderName(cls):
-        return "base64"
+    decoderName = "base64"
 
     @classmethod
     def decodeData(cls, data):

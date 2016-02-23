@@ -14,9 +14,7 @@ def getClassReference():
 class PlainData(Decoder):
     basePriority = 10
 
-    @classmethod
-    def getDecoderName(cls):
-        return "plain data"
+    decoderName = "plain data"
 
     @classmethod
     def decodeData(cls, data):

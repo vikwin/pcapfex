@@ -1,12 +1,17 @@
 # -*- coding: utf8 -*-
 __author__ = 'Viktor Winkelmann'
 
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 from Plugin import *
 
 class ProtocolDissector(Plugin):
     __metaclass__ = ABCMeta
     defaultPorts = []
+    
+    @abstractproperty
+    def protocolName(cls):
+        """ IMPORTANT: Override as Class Property """
+        return NotImplemented
 
     @classmethod
     def getPriority(cls, streamPorts = ()):
@@ -14,12 +19,7 @@ class ProtocolDissector(Plugin):
             return cls.basePriority - 50
 
         return cls.basePriority
-
-    @abstractmethod
-    def getProtocolName(cls):
-        """ IMPORTANT: Override as Class Method (using @classmethod) """
-        return NotImplemented
-
+        
     @abstractmethod
     def parseData(cls, data):
         """ IMPORTANT: Override as Class Method (using @classmethod) """

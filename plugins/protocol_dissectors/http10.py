@@ -15,9 +15,7 @@ def getClassReference():
 class HTTP10(HTTP11):
     basePriority = 45
 
-    @classmethod
-    def getProtocolName(cls):
-        return "HTTP 1.0"
+    protocolName = "HTTP 1.0"
 
     @classmethod
     def parseData(cls, data):

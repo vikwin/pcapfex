@@ -14,9 +14,7 @@ def getClassReference():
 class Unknown(ProtocolDissector):
     basePriority = 200
 
-    @classmethod
-    def getProtocolName(cls):
-        return "unknown protocol"
+    protocolName = "unknown protocol"
 
     @classmethod
     def parseData(cls, data):
