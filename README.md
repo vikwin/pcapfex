@@ -22,6 +22,14 @@ it via
 sudo pip install dpkt
 ```
 
+To achieve better performance using a multithreaded search for file objects, you
+should install the _regex_ package.
+```
+sudo pip install regex
+```
+However, this step is only optional.
+
+
 ### Usage
 To analyze a pcap-file ```samplefile.pcap``` just use
 ```
