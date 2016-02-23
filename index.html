@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <title>pcapfex by vikwin</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>pcapfex</h1>
+        <h2>&#39;Packet Capture Forensic Evidence eXtractor&#39; is a tool that finds and extracts files from packet capture files</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/vikwin/pcapfex/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/vikwin/pcapfex/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/vikwin/pcapfex" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h1>
+<a id="pcapfex" class="anchor" href="#pcapfex" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>pcapfex</h1>
+
+<p>'<strong>P</strong>acket <strong>CAP</strong>ture <strong>F</strong>orensic <strong>E</strong>vidence e<strong>X</strong>tractor' is a tool 
+that finds and extracts files from packet capture files.</p>
+
+<p>It was developed by <em>Viktor Winkelmann</em> as part of a bachelor thesis.</p>
+
+<p>The power of <em>pcapfex</em> lies in it's ease of use. You only provide it a
+pcap-file and are rewarded a structured export of all files found in it.
+<em>pcacpfex</em> allows data extraction even if non-standard protocols were used. 
+It's easy to understand plugin-system offers python developers a quick way 
+to add more file-types, encodings or
+even complex protocols.</p>
+
+<h3>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requirements</h3>
+
+<p><em>pcapfex</em> was developed and tested for <strong>Linux environments only</strong>.
+Due to missing optimizations and tests, there is no guarantee for it to work
+under Windows (though it should work).</p>
+
+<p><em>pcapfex</em> depends on <strong>Python 2.7</strong> and the <strong><em>dpkt</em></strong> package. You can install 
+it via</p>
+
+<pre><code>sudo pip install dpkt
+</code></pre>
+
+<h3>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h3>
+
+<p>To analyze a pcap-file <code>samplefile.pcap</code> just use</p>
+
+<pre><code>pcapfex.py samplefile.pcap
+</code></pre>
+
+<p>For more detailed usage information see</p>
+
+<pre><code>pcapfex.py -h
+</code></pre>
+
+<p>Please make sure to use the <code>-nv</code> flag, if the machine
+that captured the traffic was sending data as well. This will
+circumvent wrong checksums stored in the pcap-file caused by
+TCP-Checksum-Offloading.</p>
+
+<h3>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h3>
+
+<p><em>pcapfex</em> is published under the Apache 2.0 license.</p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
