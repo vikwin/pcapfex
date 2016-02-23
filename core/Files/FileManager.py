@@ -28,6 +28,7 @@ class FileManager(Thread):
         self.files.join()
         self.stop = True
         self.files.put(None)
+        self.join()
 
     def run(self):
         while not self.stop or not self.files.empty():
