@@ -7,6 +7,17 @@ from UDPStream import *
 import socket
 import os
 import sys
+import dpkt
+
+# Workaround to get access to pcap packet record capture length field
+def myIter(self):
+    while 1:
+        buf = self._Reader__f.read(dpkt.pcap.PktHdr.__hdr_len__)
+        if not buf:
+            break
+        hdr = self._Reader__ph(buf)
+        buf = self._Reader__f.read(hdr.caplen)
+        yield (hdr.tv_sec + (hdr.tv_usec / 1000000.0), hdr.caplen == hdr.len, buf)
 
 class StreamBuilder:
     def __init__(self, pcapfile = None, **kwargs):
@@ -47,20 +58,25 @@ class StreamBuilder:
 
 
         with open(pcapfile, 'rb') as pcap:
+            dpkt.pcap.Reader.__iter__ = myIter
             packets = dpkt.pcap.Reader(pcap)
+            caplenError = False
 
             fsize = float(os.path.getsize(pcapfile))
             progress = -1
 
             print '  Size of file %s: %.2f mb' % (pcapfile, fsize / 1000000)
-            for ts, rawpacket in packets:
+            for ts, complete, rawpacket in packets:
+
+                if not complete:
+                    caplenError = True
+
 
                 pos = int((pcap.tell() / fsize) * 100)
                 if pos > progress:
                     sys.stdout.write("\r\t%d%%" % (pos,))
                     sys.stdout.flush()
                     progress = pos
-
 
                 eth = dpkt.ethernet.Ethernet(rawpacket)
                 if eth.type != dpkt.ethernet.ETH_TYPE_IP:
@@ -87,7 +103,10 @@ class StreamBuilder:
                     if not self.tcpStreams[index].closed:
                         self.tcpStreams[index].addPacket(packet, ts)
                         if (packet.flags & dpkt.tcp.TH_FIN) != 0:
-                            self.tcpStreams[index].closed = True
+                            if self.tcpStreams[index].isValid():
+                                self.tcpStreams[index].closed = True
+                            else:
+                                del self.tcpStreams[index]
 
                 elif ip.p == dpkt.ip.IP_PROTO_UDP:
                     udpStream = UDPStream(socket.inet_ntoa(ip.src), packet.sport,
@@ -110,3 +129,7 @@ class StreamBuilder:
 
                 else:
                     continue
+
+            if caplenError:
+                print '\nWarning: Packet loss due to too small capture length!'
+

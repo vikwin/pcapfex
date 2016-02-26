@@ -33,24 +33,43 @@ class TCPStream(PacketStream):
 
 
     def __iter__(self):
-        sortedPackets = sorted(self.packets.items(), key=lambda kv: kv[0])
-        for k,v in sortedPackets:
-            yield v
+        sortedPackets = sorted(self.packets.values(), key=lambda v: v.seq)
+        for packet in sortedPackets:
+            yield packet
 
     def getFirstBytes(self, count):
         with closing(StringIO()) as bytes:
             index = 0
-            sortedPackets = sorted(self.packets.items(), key=lambda kv: kv[0])
+            sortedPackets = sorted(self.packets.values(), key=lambda v: v.seq)
             while len(bytes) < count and index < len(sortedPackets):
-                bytes.write(sortedPackets[index][1].data)
+                bytes.write(sortedPackets[index].data)
                 index += 1
 
             return bytes.getvalue()[:count]
 
     def getAllBytes(self):
         with closing(StringIO()) as bytes:
-            for (seq, packet) in sorted(self.packets.items(), key=lambda kv: kv[0]):
+            for packet in self:
                 bytes.write(packet.data)
 
             return bytes.getvalue()
 
+    def isValid(self):
+        if len(self.packets) == 0:
+            return False
+        
+        sortedPackets = sorted(self.packets.values(), key=lambda v: v.seq)
+        firstPacket = sortedPackets[0]
+
+        nextSeq = firstPacket.seq + len(firstPacket.data)
+
+        for packet in sortedPackets[1:]:
+            if packet.seq != nextSeq:
+                return False
+
+            if len(packet.data) == 0:
+                nextSeq += 1
+            else:
+                nextSeq += len(packet.data)
+
+        return True
