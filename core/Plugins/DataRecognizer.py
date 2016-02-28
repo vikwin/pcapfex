@@ -76,10 +76,8 @@ class DataRecognizer(Plugin):
             endindex = len(data)
 
         match = cls._regex.search(data, startindex, endindex)
-        if match:
-            return match.span()
-
-        return None
+       
+        return match.span() if match else None
 
     @classmethod
     def findAllOccurences(cls, data, startindex=0, endindex=0):
@@ -90,9 +88,7 @@ class DataRecognizer(Plugin):
             endindex = len(data)
 
         #tr = tracker.SummaryTracker()
-        occurences = []
-
-        map(lambda m: occurences.append(m.span()), cls._regex.finditer(data, startindex, endindex))
+        occurences = [m.span() for m in cls._regex.finditer(data, startindex, endindex)]
 
         #tr.print_diff()
         return occurences
