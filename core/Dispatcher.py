@@ -7,7 +7,6 @@ from Files.FileManager import *
 from Files.FileObject import *
 from Streams.StreamBuilder import *
 from Plugins.PluginManager import *
-from Plugins.EntropyClassifier import DataLengthException
 
 DEBUG = False
 
@@ -87,17 +86,15 @@ class Dispatcher:
                         files.append(file)
 
                 if self.useEntropy:
-                    try:
-                        type = self.pm.entropyClassifier.classify(payload)
-                        file = FileObject(payload)
-                        file.source = stream.ipSrc
-                        file.destination = stream.ipDst
-                        file.type = type
-                        if stream.tsFirstPacket:
-                            file.timestamp = stream.tsFirstPacket
-                        files.append(file)
-                    except DataLengthException:
-                        pass
+                    type = self.pm.entropyClassifier.classify(payload)
+                    file = FileObject(payload)
+                    file.source = stream.ipSrc
+                    file.destination = stream.ipDst
+                    file.type = type
+                    if stream.tsFirstPacket:
+                        file.timestamp = stream.tsFirstPacket
+                    files.append(file)
+                    
 
         return (stream, files)
 

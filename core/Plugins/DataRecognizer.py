@@ -69,6 +69,9 @@ class SimpleDataRecognizer(Plugin):
 
     @classmethod
     def findNextOccurence(cls, data, startindex=0, endindex=0):
+        if not hasattr(cls, '_regex'):
+            cls._buildRegexPatterns()
+            
         if endindex == 0:
             endindex = len(data)
 
@@ -80,6 +83,9 @@ class SimpleDataRecognizer(Plugin):
 
     @classmethod
     def findAllOccurences(cls, data, startindex=0, endindex=0):
+        if not hasattr(cls, '_regex'):
+            cls._buildRegexPatterns()
+        
         if endindex == 0:
             endindex = len(data)
 

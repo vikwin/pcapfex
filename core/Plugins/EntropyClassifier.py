@@ -6,9 +6,7 @@ class EntropyClass:
     PLAIN = 'rawdata/plain file'
     COMPRESSED = 'rawdata/compressed file'
     ENCRYPTED = 'rawdata/encrypted file'
-
-class DataLengthException(Exception):
-    pass
+    UNCATEGORIZED = 'rawdata/uncategorized file'
 
 class EntropyClassifier:
     RANDOM_ENTROPY = 7.9
@@ -23,9 +21,7 @@ class EntropyClassifier:
         data = data[:cls.MAXIMUM_DATA_LENGTH]
         l = len(data)
         if l < cls.MINIMUM_DATA_LENGTH:
-            raise DataLengthException(
-                'Entropy Classifier only works for data with a minumum length of %d. Given length was %d.'
-                            % (cls.MINIMUM_DATA_LENGTH, l))
+            return EntropyClass.UNCATEGORIZED
 
         h = cls._histogram(data)
         s = cls._shannonEntropy(h, l)
