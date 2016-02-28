@@ -11,7 +11,7 @@ def getClassReference():
     return GIFFile
 
 
-class GIFFile(SimpleDataRecognizer):
+class GIFFile(DataRecognizer):
     signatures = [(b'\x47\x49\x46\x38[\x37\x39]\x61', b'\x00\x3B')]
     fileEnding = "gif"
     dataType = "GIF file"

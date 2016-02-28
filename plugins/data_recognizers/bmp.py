@@ -11,7 +11,7 @@ def getClassReference():
     return BMPFile
 
 
-class BMPFile(SimpleDataRecognizer):
+class BMPFile(DataRecognizer):
     signatures = [(b'\x42\x4D.{4}\x00\x00\x00\x00', None)]
     fileEnding = "bmp"
     dataType = "Bitmap file"

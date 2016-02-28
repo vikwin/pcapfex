@@ -11,7 +11,7 @@ def getClassReference():
     return MKVFile
 
 
-class MKVFile(SimpleDataRecognizer):
+class MKVFile(DataRecognizer):
     signatures = [(b'\x1A\x45\xDF\xA3.{4}matroska', None)]
     fileEnding = "mpg"
     dataType = "MKV file"

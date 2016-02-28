@@ -11,7 +11,7 @@ def getClassReference():
     return RARFile
 
 
-class RARFile(SimpleDataRecognizer):
+class RARFile(DataRecognizer):
     signatures = [(b'\x52\x61\x72\x21\x1A\x07', None)]
     fileEnding = "rar"
     dataType = "RAR file"

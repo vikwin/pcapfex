@@ -28,7 +28,7 @@ class DataCategory:
         return self.__dict__.__iter__()
 
 
-class SimpleDataRecognizer(Plugin):
+class DataRecognizer(Plugin):
     __metaclass__ = ABCMeta
 
     @classmethod

@@ -11,7 +11,7 @@ def getClassReference():
     return WAVFile
 
 
-class WAVFile(SimpleDataRecognizer):
+class WAVFile(DataRecognizer):
     signatures = [(b'RIFF.{4}WAVEfmt', None)]
     fileEnding = "wav"
     dataType = "WAV file"

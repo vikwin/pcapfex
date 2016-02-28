@@ -11,7 +11,7 @@ def getClassReference():
     return ELFFile
 
 
-class ELFFile(SimpleDataRecognizer):
+class ELFFile(DataRecognizer):
     signatures = [(b'\x7F\x45\x4C\x46', None)]
     fileEnding = ""
     dataType = "ELF file"

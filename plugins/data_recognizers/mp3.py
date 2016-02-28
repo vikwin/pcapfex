@@ -11,7 +11,7 @@ def getClassReference():
     return MP3File
 
 
-class MP3File(SimpleDataRecognizer):
+class MP3File(DataRecognizer):
     signatures = [('ID3', None)]
     fileEnding = "mp3"
     dataType = "MP3 file"

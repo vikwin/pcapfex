@@ -11,7 +11,7 @@ def getClassReference():
     return ZipFile
 
 
-class ZipFile(SimpleDataRecognizer):
+class ZipFile(DataRecognizer):
     signatures = [(b'\x50\x4B\x03\x04', None)]
     fileEnding = "zip"
     dataType = "ZIP file"

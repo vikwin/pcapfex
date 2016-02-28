@@ -11,7 +11,7 @@ def getClassReference():
     return MPGFile
 
 
-class MPGFile(SimpleDataRecognizer):
+class MPGFile(DataRecognizer):
     signatures = [(b'\x00\x00\x01[\xB0-\xBF]', b'\x00\x00\x01[\xB7\xB9]')]
     fileEnding = "mpg"
     dataType = "MPEG file"

@@ -11,7 +11,7 @@ def getClassReference():
     return EXEFile
 
 
-class EXEFile(SimpleDataRecognizer):
+class EXEFile(DataRecognizer):
     signatures = [('MZ.{254}PE', None)]
     fileEnding = "exe"
     dataType = "Windows PE file"

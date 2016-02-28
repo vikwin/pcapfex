@@ -11,7 +11,7 @@ def getClassReference():
     return AviFile
 
 
-class AviFile(SimpleDataRecognizer):
+class AviFile(DataRecognizer):
     signatures = [('RIFF.{4}AVI LIST', None)]
     fileEnding = "avi"
     dataType = "AVI file"
