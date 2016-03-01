@@ -49,6 +49,7 @@ class FileManager(Thread):
                 number += 1
                 filename = '%s %d.%s' % (file.name, number, file.fileEnding)
 
+            filename = filename.rstrip('.')
             with open(path + filename, 'wb') as outfile:
                 outfile.write(file.data)
                 Utils.printl("Wrote file: %s%s" % (path, filename))

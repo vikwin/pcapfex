@@ -11,7 +11,7 @@ import dpkt
 
 # Workaround to get access to pcap packet record capture length field
 def myIter(self):
-    while 1:
+    while True:
         buf = self._Reader__f.read(dpkt.pcap.PktHdr.__hdr_len__)
         if not buf:
             break
@@ -65,6 +65,9 @@ class StreamBuilder:
             fsize = float(os.path.getsize(pcapfile))
             progress = -1
 
+            openTcpStreams = []
+            openUdpStreams = []
+
             print '  Size of file %s: %.2f mb' % (pcapfile, fsize / 1000000)
             for ts, complete, rawpacket in packets:
 
@@ -77,6 +80,7 @@ class StreamBuilder:
                     sys.stdout.write("\r\t%d%%" % (pos,))
                     sys.stdout.flush()
                     progress = pos
+                    #if progress > 15: break
 
                 eth = dpkt.ethernet.Ethernet(rawpacket)
                 if eth.type != dpkt.ethernet.ETH_TYPE_IP:
@@ -90,46 +94,78 @@ class StreamBuilder:
                 packet = ip.data
                 if ip.p == dpkt.ip.IP_PROTO_TCP:
 
-                    tcpStream = TCPStream(socket.inet_ntoa(ip.src), packet.sport,
-                                          socket.inet_ntoa(ip.dst), packet.dport)
-                    if tcpStream not in self.tcpStreams:
-                        if not (packet.flags & dpkt.tcp.TH_SYN) != 0:
+                    # get last matching stream occurrence for packet
+                    tcpStream = self.__findLastStreamOccurenceIn(openTcpStreams,
+                                                                 ip.src, packet.sport,
+                                                                 ip.dst, packet.dport)
+
+                    # no matching open stream found, create new stream if syn flag is set
+                    if tcpStream is None:
+                        if not packet.flags & dpkt.tcp.TH_SYN:
                             continue
-                        self.tcpStreams.append(tcpStream)
 
-                    # get index of last stream occurence
-                    index = len(self.tcpStreams) - 1 - self.tcpStreams[::-1].index(tcpStream)
+                        tcpStream = TCPStream(socket.inet_ntoa(ip.src), packet.sport,
+                                              socket.inet_ntoa(ip.dst), packet.dport)
+                        openTcpStreams.append(tcpStream)
 
-                    if not self.tcpStreams[index].closed:
-                        self.tcpStreams[index].addPacket(packet, ts)
-                        if (packet.flags & dpkt.tcp.TH_FIN) != 0:
-                            if self.tcpStreams[index].isValid():
-                                self.tcpStreams[index].closed = True
-                            else:
-                                del self.tcpStreams[index]
+                    # add packet to currently referenced stream
+                    tcpStream.addPacket(packet, ts)
+
+                    # check if stream needs to be closed due to fin flag and verify stream
+                    if packet.flags & dpkt.tcp.TH_FIN:
+                        if tcpStream.isValid():
+                            tcpStream.closed = True
+                            self.tcpStreams.append(tcpStream)
+                        openTcpStreams.remove(tcpStream)
+
 
                 elif ip.p == dpkt.ip.IP_PROTO_UDP:
-                    udpStream = UDPStream(socket.inet_ntoa(ip.src), packet.sport,
-                                          socket.inet_ntoa(ip.dst), packet.dport)
-                    udpStream.tsFirstPacket = ts
+                    if len(packet.data) == 0:
+                        continue
 
-                    if udpStream not in self.udpStreams:
-                        self.udpStreams.append(udpStream)
+                    #get last matching stream occurrence for packet
+                    udpStream = self.__findLastStreamOccurenceIn(openUdpStreams,
+                                                             ip.src, packet.sport,
+                                                             ip.dst, packet.dport)
 
-                    # get index of last stream occurence
-                    index = len(self.udpStreams) - 1 - self.udpStreams[::-1].index(udpStream)
 
-                    lastSeen = self.udpStreams[index].tsLastPacket
-                    if lastSeen and (ts - lastSeen) > self.UDP_TIMEOUT:
-                        self.udpStreams[index].closed = True
-                        self.udpStreams.append(udpStream)
-                        index = -1
+                    # no matching open stream found, create new stream
+                    if udpStream is None or udpStream.closed:
+                        udpStream = UDPStream(socket.inet_ntoa(ip.src), packet.sport,
+                                              socket.inet_ntoa(ip.dst), packet.dport)
+                        openUdpStreams.append(udpStream)
 
-                    self.udpStreams[index].addPacket(packet, ts)
+                    else:
+                        lastSeen = udpStream.tsLastPacket
 
+                        # timeout happened, close old and create new stream
+                        if lastSeen and (ts - lastSeen) > self.UDP_TIMEOUT:
+                            udpStream.closed = True
+                            openUdpStreams.remove(udpStream)
+                            self.udpStreams.append(udpStream)
+
+                            udpStream = UDPStream(socket.inet_ntoa(ip.src), packet.sport,
+                                                  socket.inet_ntoa(ip.dst), packet.dport)
+                            openUdpStreams.append(udpStream)
+
+                    # add packet to currently referenced udpStream
+                    udpStream.addPacket(packet, ts)
                 else:
                     continue
+
+            self.tcpStreams += filter(lambda s: s.isValid(), openTcpStreams)
+            self.udpStreams += openUdpStreams
 
             if caplenError:
                 print '\nWarning: Packet loss due to too small capture length!'
 
+    def __findLastStreamOccurenceIn(cls, list, ipSrc, portSrc, ipDst, portDst):
+        for stream in list[::-1]:
+            if stream.portSrc == portSrc \
+                    and stream.portDst == portDst \
+                    and stream.ipSrc == socket.inet_ntoa(ipSrc) \
+                    and stream.ipDst == socket.inet_ntoa(ipDst):
+
+                    return stream
+
+        return None
