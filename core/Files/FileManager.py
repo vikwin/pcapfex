@@ -58,7 +58,7 @@ class FileManager(Thread):
 
             with open(self.outputdir + '/files.csv', 'ab') as outcsv:
                 csvwriter = csv.writer(outcsv, delimiter=',')
-                csvwriter.writerow([file.pcapFile, file.firstPacketNumber, filename, file.fileEnding,
+                csvwriter.writerow([file.pcapFile, file.firstPacketNumber, filename, file.fileEnding, file.size,
                                     file.md5.hexdigest(), file.source, file.destination, file.timestamp])
 
             self.files.task_done()
