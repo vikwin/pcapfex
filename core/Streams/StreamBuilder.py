@@ -105,7 +105,7 @@ class StreamBuilder:
                             continue
 
                         tcpStream = TCPStream(socket.inet_ntoa(ip.src), packet.sport,
-                                              socket.inet_ntoa(ip.dst), packet.dport, packetNumber)
+                                              socket.inet_ntoa(ip.dst), packet.dport, packetNumber, pcapfile)
                         openTcpStreams.append(tcpStream)
 
                     # add packet to currently referenced stream
@@ -132,7 +132,7 @@ class StreamBuilder:
                     # no matching open stream found, create new stream
                     if udpStream is None or udpStream.closed:
                         udpStream = UDPStream(socket.inet_ntoa(ip.src), packet.sport,
-                                              socket.inet_ntoa(ip.dst), packet.dport, packetNumber)
+                                              socket.inet_ntoa(ip.dst), packet.dport, packetNumber, pcapfile)
                         openUdpStreams.append(udpStream)
 
                     else:
