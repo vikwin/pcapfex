@@ -6,11 +6,12 @@ from abc import ABCMeta, abstractmethod
 class PacketStream:
     __metaclass__ = ABCMeta
 
-    def __init__(self, ipSrc, portSrc, ipDst, portDst):
+    def __init__(self, ipSrc, portSrc, ipDst, portDst, firstPacketNumber):
         self.ipSrc = ipSrc
         self.portSrc = portSrc
         self.ipDst = ipDst
         self.portDst = portDst
+        self.firstPacketNumber = firstPacketNumber
         self.infos = "%s:%s to %s:%s" % (ipSrc, portSrc, ipDst, portDst)
         self.protocol = 'unknown protocol'
         self.tsFirstPacket = None

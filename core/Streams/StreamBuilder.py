@@ -69,7 +69,7 @@ class StreamBuilder:
             openUdpStreams = []
 
             print '  Size of file %s: %.2f mb' % (pcapfile, fsize / 1000000)
-            for ts, complete, rawpacket in packets:
+            for packetNumber, (ts, complete, rawpacket) in enumerate(packets, 1):
 
                 if not complete:
                     caplenError = True
@@ -105,7 +105,7 @@ class StreamBuilder:
                             continue
 
                         tcpStream = TCPStream(socket.inet_ntoa(ip.src), packet.sport,
-                                              socket.inet_ntoa(ip.dst), packet.dport)
+                                              socket.inet_ntoa(ip.dst), packet.dport, packetNumber)
                         openTcpStreams.append(tcpStream)
 
                     # add packet to currently referenced stream
@@ -132,7 +132,7 @@ class StreamBuilder:
                     # no matching open stream found, create new stream
                     if udpStream is None or udpStream.closed:
                         udpStream = UDPStream(socket.inet_ntoa(ip.src), packet.sport,
-                                              socket.inet_ntoa(ip.dst), packet.dport)
+                                              socket.inet_ntoa(ip.dst), packet.dport, packetNumber)
                         openUdpStreams.append(udpStream)
 
                     else:

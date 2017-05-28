@@ -38,7 +38,8 @@ class FileManager(Thread):
                 self.files.task_done()
                 continue
 
-            path = "%s/%ss/%s_%s/%s/" % (self.outputdir, file.type, file.source, file.destination, file.timestamp)
+            path = "%s/%ss/%s_%s/%s_%s/" % (self.outputdir, file.type, file.source, file.destination, file.timestamp,
+                                            file.firstPacketNumber)
             if not os.path.exists(path):
                 os.makedirs(path)
 

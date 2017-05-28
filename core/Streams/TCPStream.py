@@ -7,8 +7,8 @@ from PacketStream import *
 import dpkt
 
 class TCPStream(PacketStream):
-    def __init__(self, ipSrc, portSrc, ipDst, portDst):
-        PacketStream.__init__(self, ipSrc, portSrc, ipDst, portDst)
+    def __init__(self, ipSrc, portSrc, ipDst, portDst, firstPacketNumber):
+        PacketStream.__init__(self, ipSrc, portSrc, ipDst, portDst, firstPacketNumber)
 
         self.packets = dict()
 

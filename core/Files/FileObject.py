@@ -12,6 +12,7 @@ class FileObject(object):
         self._timestamp = 'unknown'
         self.type = 'unknown'
         self.fileEnding = 'unknown'
+        self.firstPacketNumber = None
 
     @property
     def name(self):
