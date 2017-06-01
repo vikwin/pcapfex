@@ -145,7 +145,7 @@ class StreamBuilder:
                             self.udpStreams.append(udpStream)
 
                             udpStream = UDPStream(socket.inet_ntoa(ip.src), packet.sport,
-                                                  socket.inet_ntoa(ip.dst), packet.dport)
+                                                  socket.inet_ntoa(ip.dst), packet.dport, packetNumber, pcapfile)
                             openUdpStreams.append(udpStream)
 
                     # add packet to currently referenced udpStream
