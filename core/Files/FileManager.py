@@ -56,7 +56,7 @@ class FileManager(Thread):
                 outfile.write(file.data)
                 Utils.printl("Wrote file: %s%s" % (path, filename))
 
-            with open(self.outputdir + '/files.csv', 'ab') as outcsv:
+            with open(self.outputdir + '/' + os.path.basename(file.pcapFile) + ".csv", 'ab') as outcsv:
                 csvwriter = csv.writer(outcsv, delimiter=',')
                 csvwriter.writerow([file.pcapFile, file.firstPacketNumber, filename, file.fileEnding, file.size,
                                     file.md5.hexdigest(), file.source, file.destination, file.timestamp])
