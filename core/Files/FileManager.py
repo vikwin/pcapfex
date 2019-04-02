@@ -1,4 +1,6 @@
 # -*- coding: utf8 -*-
+import csv
+
 __author__ = 'Viktor Winkelmann'
 
 import sys
@@ -53,5 +55,10 @@ class FileManager(Thread):
             with open(path + filename, 'wb') as outfile:
                 outfile.write(file.data)
                 Utils.printl("Wrote file: %s%s" % (path, filename))
+
+            with open(self.outputdir + '/files.csv', 'ab') as outcsv:
+                csvwriter = csv.writer(outcsv, delimiter=',')
+                csvwriter.writerow([file.pcapFile, file.firstPacketNumber, filename, file.fileEnding, file.size,
+                                    file.md5.hexdigest(), file.source, file.destination, file.timestamp])
 
             self.files.task_done()

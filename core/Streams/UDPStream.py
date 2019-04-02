@@ -5,8 +5,8 @@ from PacketStream import *
 import dpkt
 
 class UDPStream(PacketStream):
-    def __init__(self, ipSrc, portSrc, ipDst, portDst):
-        PacketStream.__init__(self, ipSrc, portSrc, ipDst, portDst)
+    def __init__(self, ipSrc, portSrc, ipDst, portDst, firstPacketNumber, pcapFile):
+        PacketStream.__init__(self, ipSrc, portSrc, ipDst, portDst, firstPacketNumber, pcapFile)
 
         self.packets = []
         self.tsLastPacket = None

@@ -79,6 +79,8 @@ class Dispatcher:
                         file = FileObject(payload[occ[0]:occ[1]])
                         file.source = stream.ipSrc
                         file.destination = stream.ipDst
+                        file.firstPacketNumber = stream.firstPacketNumber
+                        file.pcapFile = stream.pcapFile
                         file.fileEnding = self.pm.dataRecognizers[datarecognizer].fileEnding
                         file.type = self.pm.dataRecognizers[datarecognizer].dataCategory
                         if stream.tsFirstPacket:
