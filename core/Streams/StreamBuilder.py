@@ -15,7 +15,12 @@ def myIter(self):
         buf = self._Reader__f.read(dpkt.pcap.PktHdr.__hdr_len__)
         if not buf:
             break
-        hdr = self._Reader__ph(buf)
+        else:
+            try:
+                hdr = self._Reader__ph(buf)
+            except:
+                print(' > Finish with error')
+                break
         buf = self._Reader__f.read(hdr.caplen)
         yield (hdr.tv_sec + (hdr.tv_usec / 1000000.0), hdr.caplen == hdr.len, buf)
 
@@ -67,6 +72,7 @@ class StreamBuilder:
 
             openTcpStreams = []
             openUdpStreams = []
+            badPackets, firstError, lastError = 0, 0, 0
 
             print '  Size of file %s: %.2f mb' % (pcapfile, fsize / 1000000)
             for packetNumber, (ts, complete, rawpacket) in enumerate(packets, 1):
@@ -82,7 +88,18 @@ class StreamBuilder:
                     progress = pos
                     #if progress > 15: break
 
-                eth = dpkt.ethernet.Ethernet(rawpacket)
+                try:
+                    eth = dpkt.ethernet.Ethernet(rawpacket)
+                except:
+                    if packetNumber > lastError:
+                        lastError = packetNumber
+                        badPackets = badPackets + 1
+                        if not firstError:
+                            firstError = packetNumber
+                    sys.stdout.write("\r\t%d%% < Bad packet %d (%d)" % (pos, packetNumber, badPackets,))
+                    sys.stdout.flush()
+                    continue
+
                 if eth.type != dpkt.ethernet.ETH_TYPE_IP:
                     continue
 
@@ -158,6 +175,8 @@ class StreamBuilder:
 
             if caplenError:
                 print '\nWarning: Packet loss due to too small capture length!'
+            if badPackets:
+                print '\nWarning: %d bad packets between %d and %d.' % (badPackets, firstError, lastError)
 
     def __findLastStreamOccurenceIn(cls, list, ipSrc, portSrc, ipDst, portDst):
         for stream in list[::-1]:
